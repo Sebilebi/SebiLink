@@ -1,0 +1,136 @@
+{
+    "package":  "SebiLink - Pokemon Z",
+    "game":  "Pokemon Z V2.18 Windows MKXP",
+    "files":  [
+                  {
+                      "path":  ".gitignore",
+                      "bytes":  318,
+                      "sha256":  "27f855b9ad6e5a9113cfe0afa6abff273afe294ca0f66652760306031820428e"
+                  },
+                  {
+                      "path":  "mkxp.json",
+                      "bytes":  266,
+                      "sha256":  "45ea86bd9ef0a8ee4d0801ed2b004dc27e5021fae13e3fe34a758b1bab906dfc"
+                  },
+                  {
+                      "path":  "multiplayer/ai-codex/gameplay-ai.md",
+                      "bytes":  10081,
+                      "sha256":  "2a24ad6936a0fd11b467c97ba6e3a3b4a86dc169261c95e9a66c16d12f9a0b39"
+                  },
+                  {
+                      "path":  "multiplayer/battle-spectator/SebiBattleSpectator.ps1",
+                      "bytes":  9333,
+                      "sha256":  "c0fd1b0a2146d141b1e8c76b19f8f409b908396711e6cca934da56fb61186097"
+                  },
+                  {
+                      "path":  "multiplayer/battle-spectator/SebiSpectatorCapture.ps1",
+                      "bytes":  5979,
+                      "sha256":  "509debf5acc6ee0639fe04d21910ec4e26f1600ce4ccbf01070ac0990307f999"
+                  },
+                  {
+                      "path":  "multiplayer/level-review/SebiLevelReview.ps1",
+                      "bytes":  34343,
+                      "sha256":  "79620f519317ec268dfdb0a88a1f31ada9be9b5634b590cb286cf58b450880ae"
+                  },
+                  {
+                      "path":  "multiplayer/pvp-preview/SebiPvpPreview.ps1",
+                      "bytes":  12784,
+                      "sha256":  "64b83d3d5e057df4cc3b2fa56f3061a667ca9db8ec1d32261f6572d0f7cf02eb"
+                  },
+                  {
+                      "path":  "multiplayer/pvp-teams/showdown_teams.txt",
+                      "bytes":  9062,
+                      "sha256":  "6f8fefa7594315edcbf1e7c0eae10b10f7325eeebb3a84f269886c9f70c037f6"
+                  },
+                  {
+                      "path":  "multiplayer/randomizer-species.txt",
+                      "bytes":  21385,
+                      "sha256":  "e9565668c47ab1d93279375484283a142d34cf9ef936d0f37e1280a2ea0da5e9"
+                  },
+                  {
+                      "path":  "multiplayer/save-editor/SebiSaveEditor.ps1",
+                      "bytes":  266331,
+                      "sha256":  "7d4da47e1af9acf4e5d5de4035b4dbc5cdd049d3882ac33f2d8147417350c870"
+                  },
+                  {
+                      "path":  "multiplayer/save-manager/SebiCaptureWindow.ps1",
+                      "bytes":  1522,
+                      "sha256":  "9003dddaf68fa9034fac1b455402c5ece2207eb4ed73f6c88b899ab79b3ab999"
+                  },
+                  {
+                      "path":  "multiplayer/save-manager/SebiSaveManager.ps1",
+                      "bytes":  56440,
+                      "sha256":  "555f3a36b8c81f7ca0ff4ed4b9e91110666e6076a299ca43fdc75db9b0a64370"
+                  },
+                  {
+                      "path":  "multiplayer/SebiLinkBootstrap.rb",
+                      "bytes":  2002,
+                      "sha256":  "a9a442e0b7eec31f82e12b7752c74f30b270ed051dc8e720814c28eaffc0310d"
+                  },
+                  {
+                      "path":  "multiplayer/sebilink-hub/SebiLinkHub.ps1",
+                      "bytes":  108509,
+                      "sha256":  "3261318317d3ba848cf339cae13c395e26e00f2130d372c1269f7f6c799f8799"
+                  },
+                  {
+                      "path":  "multiplayer/SebiRandomizer.rb",
+                      "bytes":  35675,
+                      "sha256":  "982ab39d1862f8e481b72c5b79494967c38cb156d78cfba8859757d6687f534a"
+                  },
+                  {
+                      "path":  "multiplayer/SebiVisualMultiplayer.rb",
+                      "bytes":  817598,
+                      "sha256":  "1d19291af6f5e111ee88def1d61d14546913327d51852cf1dcf1ebb195ba05ac"
+                  },
+                  {
+                      "path":  "multiplayer/server.js",
+                      "bytes":  4484,
+                      "sha256":  "b6d8bfaa66191f06a242b53c84417f69c9d9616d5c4cd0b98bdc2864b38c5632"
+                  },
+                  {
+                      "path":  "multiplayer/special-trades/blocked_species.txt",
+                      "bytes":  1221,
+                      "sha256":  "2ac69a9272faeb0e3dbd1b8b7690bffc986790528a677349bd4d3a4fd67b8880"
+                  },
+                  {
+                      "path":  "multiplayer/start-server.ps1",
+                      "bytes":  1131,
+                      "sha256":  "7506b6d59bb2735748b18bd0d7b86c4d9ca3ba24f424a0856c5b582c9179a938"
+                  },
+                  {
+                      "path":  "multiplayer/start-server-background.ps1",
+                      "bytes":  1709,
+                      "sha256":  "7a215b9a56e1c60a39dd1ae32978b4fed33cae5cb8a1c360f557a3d6b20834e3"
+                  },
+                  {
+                      "path":  "multiplayer/stop-server.ps1",
+                      "bytes":  1292,
+                      "sha256":  "2c619b104cfb329b0f4dea6e0e5fab75d2ffe6579567b262c4f96682b6b9d8f8"
+                  },
+                  {
+                      "path":  "README.md",
+                      "bytes":  5205,
+                      "sha256":  "1d00e978906ce236b5a3cb19ca2c681ec0ffd257d28bfbcad5d76f251a4b2897"
+                  },
+                  {
+                      "path":  "tools/randomizer/build-catalog.rb",
+                      "bytes":  3277,
+                      "sha256":  "a2cbe868a77d2cc41760bb1864e76d91b104558d54d79462e18d0711e0792a48"
+                  },
+                  {
+                      "path":  "tools/randomizer/inspect-events.rb",
+                      "bytes":  1312,
+                      "sha256":  "4fd545574a9f6d611857f0b6001bab905e6bfaf2807d045edfc7e37f4780e8bd"
+                  },
+                  {
+                      "path":  "tools/randomizer/README.md",
+                      "bytes":  3055,
+                      "sha256":  "bc783e9eda6e0e82df950d250ccb632d08de6fecdd2f9c67444205616bf6dd56"
+                  },
+                  {
+                      "path":  "tools/randomizer/verify-randomizer.rb",
+                      "bytes":  20976,
+                      "sha256":  "23bbdf40677af2850262483ab6d2a361677d53372d8dc0088cb6a48a2765c56f"
+                  }
+              ]
+}

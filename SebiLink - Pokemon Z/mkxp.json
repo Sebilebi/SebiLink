@@ -1,0 +1,11 @@
+{
+  "fixedAspectRatio": true,
+  "smoothScaling": false,
+  "vsync": false,
+  "syncToRefreshrate": false,
+  "windowTitle": "Pokemon Z",
+  "subImageFix": false,
+  "enableBlitting": true,
+  "enableReset": false,
+  "preloadScript": ["multiplayer/SebiLinkBootstrap.rb"]
+}

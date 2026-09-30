@@ -1,0 +1,615 @@
+=== Sand Balance ===
+Tyranitar @ Leftovers
+Ability: Sand Stream
+Level: 50
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Stone Edge
+- Crunch
+- Earthquake
+- Stealth Rock
+
+Excadrill @ Life Orb
+Ability: Sand Rush
+Level: 50
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Earthquake
+- Iron Head
+- Rock Slide
+- Swords Dance
+
+Garchomp @ Choice Scarf
+Ability: Rough Skin
+Level: 50
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Earthquake
+- Dragon Claw
+- Stone Edge
+- Fire Fang
+
+Scizor @ Choice Band
+Ability: Technician
+Level: 50
+EVs: 248 HP / 252 Atk / 8 SpD
+Adamant Nature
+- Bullet Punch
+- U-turn
+- Superpower
+- Pursuit
+
+Dragonite @ Lum Berry
+Ability: Multiscale
+Level: 50
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Dragon Dance
+- Outrage
+- Fire Punch
+- Extreme Speed
+
+Clefable @ Leftovers
+Ability: Magic Guard
+Level: 50
+EVs: 252 HP / 172 Def / 84 SpD
+Calm Nature
+- Moonblast
+- Soft-Boiled
+- Thunder Wave
+- Calm Mind
+
+=== Rain Offense ===
+Pelipper @ Damp Rock
+Ability: Drizzle
+Level: 50
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Scald
+- Hurricane
+- Roost
+- U-turn
+
+Kingdra @ Life Orb
+Ability: Swift Swim
+Level: 50
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Hydro Pump
+- Draco Meteor
+- Ice Beam
+- Rain Dance
+
+Swampert @ Leftovers
+Ability: Torrent
+Level: 50
+EVs: 252 HP / 252 Atk / 4 Def
+Adamant Nature
+- Waterfall
+- Earthquake
+- Ice Punch
+- Stealth Rock
+
+Ferrothorn @ Rocky Helmet
+Ability: Iron Barbs
+Level: 50
+EVs: 252 HP / 88 Def / 168 SpD
+Relaxed Nature
+- Power Whip
+- Gyro Ball
+- Leech Seed
+- Protect
+
+Zapdos @ Leftovers
+Ability: Pressure
+Level: 50
+EVs: 248 HP / 188 Def / 72 Spe
+Bold Nature
+- Thunderbolt
+- Heat Wave
+- Roost
+- Defog
+
+Gyarados @ Lum Berry
+Ability: Intimidate
+Level: 50
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Dragon Dance
+- Waterfall
+- Bounce
+- Earthquake
+
+=== Sun Pressure ===
+Torkoal @ Heat Rock
+Ability: Drought
+Level: 50
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Lava Plume
+- Stealth Rock
+- Rapid Spin
+- Yawn
+
+Venusaur @ Life Orb
+Ability: Chlorophyll
+Level: 50
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Giga Drain
+- Sludge Bomb
+- Weather Ball
+- Growth
+
+Charizard @ Charizardite Y
+Ability: Blaze
+Level: 50
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Flamethrower
+- Solar Beam
+- Air Slash
+- Roost
+
+Heatran @ Leftovers
+Ability: Flash Fire
+Level: 50
+EVs: 252 HP / 4 SpA / 252 SpD
+Calm Nature
+- Magma Storm
+- Earth Power
+- Toxic
+- Protect
+
+Cresselia @ Leftovers
+Ability: Levitate
+Level: 50
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Moonlight
+- Psychic
+- Thunder Wave
+- Lunar Dance
+
+Mamoswine @ Focus Sash
+Ability: Thick Fat
+Level: 50
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Earthquake
+- Icicle Crash
+- Ice Shard
+- Stealth Rock
+
+=== Stall Classic ===
+Blissey @ Leftovers
+Ability: Natural Cure
+Level: 50
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Seismic Toss
+- Soft-Boiled
+- Toxic
+- Thunder Wave
+
+Skarmory @ Rocky Helmet
+Ability: Sturdy
+Level: 50
+EVs: 252 HP / 232 Def / 24 Spe
+Impish Nature
+- Brave Bird
+- Roost
+- Spikes
+- Whirlwind
+
+Quagsire @ Leftovers
+Ability: Unaware
+Level: 50
+EVs: 252 HP / 252 Def / 4 SpD
+Relaxed Nature
+- Scald
+- Earthquake
+- Recover
+- Toxic
+
+Sableye @ Leftovers
+Ability: Prankster
+Level: 50
+EVs: 252 HP / 120 Def / 136 SpD
+Careful Nature
+- Knock Off
+- Will-O-Wisp
+- Recover
+- Taunt
+
+Slowbro @ Rocky Helmet
+Ability: Regenerator
+Level: 50
+EVs: 252 HP / 252 Def / 4 SpA
+Bold Nature
+- Scald
+- Psyshock
+- Slack Off
+- Thunder Wave
+
+Amoonguss @ Black Sludge
+Ability: Regenerator
+Level: 50
+EVs: 252 HP / 172 Def / 84 SpD
+Bold Nature
+- Giga Drain
+- Sludge Bomb
+- Spore
+- Clear Smog
+
+=== Hyper Offense ===
+Grimmsnarl @ Light Clay
+Ability: Prankster
+Level: 50
+EVs: 252 HP / 4 Atk / 252 SpD
+Careful Nature
+- Reflect
+- Light Screen
+- Taunt
+- Spirit Break
+
+Volcarona @ Lum Berry
+Ability: Flame Body
+Level: 50
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Quiver Dance
+- Fiery Dance
+- Bug Buzz
+- Giga Drain
+
+Bisharp @ Life Orb
+Ability: Defiant
+Level: 50
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Swords Dance
+- Sucker Punch
+- Iron Head
+- Knock Off
+
+Hawlucha @ Sitrus Berry
+Ability: Unburden
+Level: 50
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Swords Dance
+- Acrobatics
+- High Jump Kick
+- Stone Edge
+
+Azumarill @ Sitrus Berry
+Ability: Huge Power
+Level: 50
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Belly Drum
+- Aqua Jet
+- Play Rough
+- Knock Off
+
+Gengar @ Focus Sash
+Ability: Cursed Body
+Level: 50
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Shadow Ball
+- Sludge Wave
+- Focus Blast
+- Destiny Bond
+
+=== Trick Room ===
+Cresselia @ Mental Herb
+Ability: Levitate
+Level: 50
+EVs: 252 HP / 252 Def / 4 SpD
+Relaxed Nature
+IVs: 0 Spe
+- Trick Room
+- Psychic
+- Moonlight
+- Lunar Dance
+
+Rhyperior @ Weakness Policy
+Ability: Solid Rock
+Level: 50
+EVs: 252 HP / 252 Atk / 4 SpD
+Brave Nature
+IVs: 0 Spe
+- Earthquake
+- Rock Slide
+- Ice Punch
+- Protect
+
+Conkeldurr @ Flame Orb
+Ability: Guts
+Level: 50
+EVs: 252 HP / 252 Atk / 4 SpD
+Brave Nature
+IVs: 0 Spe
+- Drain Punch
+- Mach Punch
+- Knock Off
+- Facade
+
+Reuniclus @ Life Orb
+Ability: Magic Guard
+Level: 50
+EVs: 252 HP / 252 SpA / 4 SpD
+Quiet Nature
+IVs: 0 Spe
+- Trick Room
+- Psychic
+- Focus Blast
+- Recover
+
+Marowak @ Thick Club
+Ability: Rock Head
+Level: 50
+EVs: 252 HP / 252 Atk / 4 SpD
+Brave Nature
+IVs: 0 Spe
+- Bonemerang
+- Stone Edge
+- Double-Edge
+- Swords Dance
+
+Hatterene @ Leftovers
+Ability: Magic Bounce
+Level: 50
+EVs: 252 HP / 252 SpA / 4 SpD
+Quiet Nature
+IVs: 0 Spe
+- Trick Room
+- Psychic
+- Dazzling Gleam
+- Mystical Fire
+
+=== Friends Battle Box ===
+Mandibuzz @ Leftovers
+Ability: Overcoat
+Level: 50
+EVs: 248 HP / 136 Def / 124 SpD
+Careful Nature
+- Foul Play
+- Roost
+- Defog
+- Taunt
+
+Excadrill @ Focus Sash
+Ability: Mold Breaker
+Level: 50
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Earthquake
+- Iron Head
+- Rock Tomb
+- Rapid Spin
+
+Tyranitar @ Assault Vest
+Ability: Sand Stream
+Level: 50
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Stone Edge
+- Crunch
+- Earthquake
+- Fire Punch
+
+Heliolisk @ Choice Specs
+Ability: Dry Skin
+Level: 50
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Thunderbolt
+- Hyper Voice
+- Surf
+- Volt Switch
+
+Hawlucha @ Power Herb
+Ability: Unburden
+Level: 50
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Sky Attack
+- High Jump Kick
+- Acrobatics
+- Swords Dance
+
+Gastrodon @ Sitrus Berry
+Ability: Storm Drain
+Level: 50
+EVs: 252 HP / 4 SpA / 252 SpD
+Calm Nature
+- Scald
+- Earth Power
+- Recover
+- Toxic
+
+=== Dragon Stack ===
+Dragonite @ Lum Berry
+Ability: Multiscale
+Level: 50
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Dragon Dance
+- Outrage
+- Fire Punch
+- Extreme Speed
+
+Garchomp @ Rocky Helmet
+Ability: Rough Skin
+Level: 50
+EVs: 252 HP / 164 Def / 92 Spe
+Impish Nature
+- Earthquake
+- Dragon Tail
+- Stealth Rock
+- Toxic
+
+Hydreigon @ Choice Scarf
+Ability: Levitate
+Level: 50
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Draco Meteor
+- Dark Pulse
+- Flamethrower
+- U-turn
+
+Salamence @ Life Orb
+Ability: Intimidate
+Level: 50
+EVs: 252 Atk / 4 SpA / 252 Spe
+Naive Nature
+- Dragon Dance
+- Outrage
+- Earthquake
+- Fire Blast
+
+Magnezone @ Choice Specs
+Ability: Magnet Pull
+Level: 50
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Thunderbolt
+- Flash Cannon
+- Volt Switch
+- Hidden Power
+
+Scizor @ Choice Band
+Ability: Technician
+Level: 50
+EVs: 248 HP / 252 Atk / 8 SpD
+Adamant Nature
+- Bullet Punch
+- U-turn
+- Superpower
+- Pursuit
+
+=== Water Balance ===
+Greninja @ Life Orb
+Ability: Protean
+Level: 50
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Hydro Pump
+- Dark Pulse
+- Ice Beam
+- Gunk Shot
+
+Azumarill @ Sitrus Berry
+Ability: Huge Power
+Level: 50
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Belly Drum
+- Aqua Jet
+- Play Rough
+- Knock Off
+
+Toxapex @ Black Sludge
+Ability: Regenerator
+Level: 50
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Scald
+- Recover
+- Haze
+- Toxic Spikes
+
+Gyarados @ Leftovers
+Ability: Intimidate
+Level: 50
+EVs: 88 HP / 252 Atk / 168 Spe
+Adamant Nature
+- Dragon Dance
+- Waterfall
+- Bounce
+- Taunt
+
+Gastrodon @ Leftovers
+Ability: Storm Drain
+Level: 50
+EVs: 252 HP / 4 SpA / 252 SpD
+Calm Nature
+- Scald
+- Earth Power
+- Recover
+- Toxic
+
+Ludicolo @ Life Orb
+Ability: Swift Swim
+Level: 50
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Hydro Pump
+- Giga Drain
+- Ice Beam
+- Rain Dance
+
+=== Legendary Test ===
+Groudon @ Leftovers
+Ability: Drought
+Level: 50
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Earthquake
+- Stone Edge
+- Fire Punch
+- Swords Dance
+
+Kyogre @ Choice Scarf
+Ability: Drizzle
+Level: 50
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Water Spout
+- Surf
+- Ice Beam
+- Thunder
+
+Rayquaza @ Life Orb
+Ability: Air Lock
+Level: 50
+EVs: 252 Atk / 4 SpA / 252 Spe
+Naive Nature
+- Dragon Ascent
+- Extreme Speed
+- Earthquake
+- Draco Meteor
+
+Zacian @ Rusted Sword
+Ability: Intrepid Sword
+Level: 50
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Behemoth Blade
+- Play Rough
+- Close Combat
+- Swords Dance
+
+Yveltal @ Assault Vest
+Ability: Dark Aura
+Level: 50
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Foul Play
+- Oblivion Wing
+- Sucker Punch
+- U-turn
+
+Eternatus @ Black Sludge
+Ability: Pressure
+Level: 50
+EVs: 252 HP / 4 SpA / 252 Spe
+Timid Nature
+- Dynamax Cannon
+- Sludge Bomb
+- Flamethrower
+- Recover
