@@ -1,5 +1,7 @@
 # SebiLink - Pokemon Z
 
+**Version SebiLink: 1.0.0.**
+
 Complemento para **Pokemon Z V2.18 de ericlostie, Windows/MKXP**.
 Esta carpeta contiene el codigo de SebiLink y su configuracion de arranque.
 Necesitas conseguir el juego original por separado. No incluye ejecutables,
@@ -58,6 +60,40 @@ contexto de juego portable se incluyen en `multiplayer/ai-codex/gameplay-ai.md`.
 Si existe una skill local `sebi-pokelink`, el hub la prefiere.
 
 ## Actualizar, desactivar y datos personales
+
+### Actualizaciones desde GitHub
+
+El origen publico es [Sebilebi/SebiLink](https://github.com/Sebilebi/SebiLink).
+Cada inicio busca la version de Pokemon Z en la tabla del README de la raiz.
+Si es mas nueva, pregunta «Actualizar ahora?» con Si/No. No la instala al rechazar.
+La busqueda inicial ocurre en segundo plano; sin Internet el juego sigue funcionando.
+«Buscar actualizaciones» esta en SebiLink y en F12 > Todas / Sistema. Una busqueda
+manual informa si ya tienes la version mas reciente o si falla la conexion.
+La cabecera de F12 muestra la version instalada del complemento.
+
+Al aceptar en una partida cargada, primero se guarda en su slot actual. Si falla
+el guardado, se cancela. Se pausa el juego mientras se descargan y verifican
+exclusivamente los archivos del manifiesto de esta carpeta, desde un unico commit.
+No se clona el repositorio completo y no hace falta Git. Despues se cierra el juego,
+se sustituyen los archivos del complemento y se abre Game.exe automaticamente.
+No se inicia una partida automaticamente tras reiniciar: elige continuar.
+No se permite actualizar en combate, eventos o transiciones.
+
+El instalador conserva la configuracion MKXP personalizada, anade su preload,
+y guarda una copia de los archivos sustituidos en SebiLinkConfig/updates/runtime.
+Si falla la instalacion, restaura la version anterior. No toca scripts originales,
+assets, partidas, conversaciones ni configuracion personal. El relay local se
+cierra al reiniciar y tendras que volver a abrir/unirte a tu sala.
+
+Para publicar una version nueva, aumenta la version del complemento en
+multiplayer/updates/update-source.json, en este README y en la tabla del README
+de la raiz (por ejemplo 1.0.0 a 1.1.0). Regenera MANIFEST.json con la herramienta
+de release del workspace; debe tener esa version y los SHA-256 actualizados.
+Sube la carpeta completa y el README de la raiz juntos en el mismo commit.
+Una version publicada mas baja nunca provoca una bajada de version automatica.
+Las copias antiguas sin actualizador necesitan copiar este paquete una primera vez.
+
+### Instalacion manual y desactivacion
 
 Para actualizar, cierra el juego y vuelve a copiar el contenido del complemento.
 Configuraciones, snapshots, chats, logs y respaldos se generan localmente en

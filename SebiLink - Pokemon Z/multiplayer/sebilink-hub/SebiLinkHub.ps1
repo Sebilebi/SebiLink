@@ -16,6 +16,15 @@ $script:MultiplayerDir = Split-Path $script:BaseDir -Parent
 $script:GameDir = Split-Path $script:MultiplayerDir -Parent
 $script:GameExePath = Join-Path $script:GameDir "Game.exe"
 
+function Get-HubAddonVersion {
+  try {
+    $source = Get-Content -LiteralPath (Join-Path $script:MultiplayerDir "updates\update-source.json") -Raw -Encoding UTF8 | ConvertFrom-Json
+    if ($source.version -match '^\d+\.\d+\.\d+$') { return [string]$source.version }
+  } catch {}
+  return "desconocida"
+}
+$script:AddonVersion = Get-HubAddonVersion
+
 function Get-SebiLinkConfigRoot {
   $profile = $env:USERPROFILE
   if ([string]::IsNullOrWhiteSpace($profile)) {
@@ -282,6 +291,7 @@ $script:Actions = @(
   New-HubAction "Sistema" "Cargar partida" "Guardados" "load_backup" "Abre la ventana de partidas, respaldos y accesos rapidos."
   New-HubAction "Sistema" "Gestor de partidas" "F8" "open_quick_saves" "Abre la ventana de partidas en la pestana Cargar partida."
   New-HubAction "Sistema" "Controles extra" "SebiLink > Controles" "open_extra_controls" "Cambia las teclas de PokemonDB, debilidades e igualar niveles."
+  New-HubAction "Sistema" "Buscar actualizaciones" "SebiLink" "check_sebilink_updates" "Busca una nueva version de Pokemon Z en GitHub; pregunta antes de guardar, actualizar y reiniciar."
 )
 
 if ($SelfTest) {
@@ -2541,7 +2551,7 @@ function New-AiTab {
 }
 
 $form = New-Object System.Windows.Forms.Form
-$form.Text = "SebiLink Hub F12 | Pokemon Z"
+$form.Text = "SebiLink Hub F12 | Pokemon Z | v" + $script:AddonVersion
 $form.StartPosition = "CenterScreen"
 $form.Size = New-Object System.Drawing.Size(760, 500)
 $form.MinimumSize = New-Object System.Drawing.Size(620, 380)
@@ -2567,10 +2577,10 @@ $top.Dock = [System.Windows.Forms.DockStyle]::Fill
 $root.Controls.Add($top, 0, 0)
 
 $title = New-Object System.Windows.Forms.Label
-$title.Text = "SebiLink Hub"
+$title.Text = "SebiLink Hub - v" + $script:AddonVersion
 $title.Font = New-Object System.Drawing.Font("Segoe UI", 14, [System.Drawing.FontStyle]::Bold)
 $title.Location = New-Object System.Drawing.Point(0, 0)
-$title.Size = New-Object System.Drawing.Size(230, 26)
+$title.Size = New-Object System.Drawing.Size(420, 26)
 $top.Controls.Add($title)
 
 $subtitle = New-Object System.Windows.Forms.Label

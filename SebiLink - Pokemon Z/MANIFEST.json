@@ -1,6 +1,7 @@
 {
     "package":  "SebiLink - Pokemon Z",
     "game":  "Pokemon Z V2.18 Windows MKXP",
+    "version":  "1.0.0",
     "files":  [
                   {
                       "path":  ".gitignore",
@@ -69,8 +70,8 @@
                   },
                   {
                       "path":  "multiplayer/sebilink-hub/SebiLinkHub.ps1",
-                      "bytes":  108509,
-                      "sha256":  "3261318317d3ba848cf339cae13c395e26e00f2130d372c1269f7f6c799f8799"
+                      "bytes":  109099,
+                      "sha256":  "072b9b901c6f6d30e50a031e1abb19725eece6be91fc3443a7f99cbedde2240c"
                   },
                   {
                       "path":  "multiplayer/SebiRandomizer.rb",
@@ -78,9 +79,14 @@
                       "sha256":  "982ab39d1862f8e481b72c5b79494967c38cb156d78cfba8859757d6687f534a"
                   },
                   {
+                      "path":  "multiplayer/SebiUpdater.rb",
+                      "bytes":  7645,
+                      "sha256":  "3deedef73a4611c9a4c64c297642793d2985adc012ea94d8a7807a8ebcb1f15d"
+                  },
+                  {
                       "path":  "multiplayer/SebiVisualMultiplayer.rb",
-                      "bytes":  817598,
-                      "sha256":  "1d19291af6f5e111ee88def1d61d14546913327d51852cf1dcf1ebb195ba05ac"
+                      "bytes":  817961,
+                      "sha256":  "ed28dbe1daa1f93abb063c5926947f8cf8107b903c366a380b4fda027de0d587"
                   },
                   {
                       "path":  "multiplayer/server.js",
@@ -108,9 +114,24 @@
                       "sha256":  "2c619b104cfb329b0f4dea6e0e5fab75d2ffe6579567b262c4f96682b6b9d8f8"
                   },
                   {
+                      "path":  "multiplayer/updates/SebiUpdateCore.ps1",
+                      "bytes":  13423,
+                      "sha256":  "eba92176e07c6c412d47be19c3f0965a993b2373c014304f3b0486167a4f5cdd"
+                  },
+                  {
+                      "path":  "multiplayer/updates/SebiUpdateWorker.ps1",
+                      "bytes":  4508,
+                      "sha256":  "755dab224d763ff4d610474ea3abf632249e25682b46d0c486bf57c11b480b5a"
+                  },
+                  {
+                      "path":  "multiplayer/updates/update-source.json",
+                      "bytes":  169,
+                      "sha256":  "d3b6aab8b92001697fc93213de5349af931f90be513981e737a07f01491a2ece"
+                  },
+                  {
                       "path":  "README.md",
-                      "bytes":  5205,
-                      "sha256":  "1d00e978906ce236b5a3cb19ca2c681ec0ffd257d28bfbcad5d76f251a4b2897"
+                      "bytes":  7344,
+                      "sha256":  "628aef04ce8ebc5c0f0da05892f6cb2ea2ca3abe4370680f12b2905e1f2a9460"
                   },
                   {
                       "path":  "tools/randomizer/build-catalog.rb",

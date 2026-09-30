@@ -1,5 +1,5 @@
 # SebiPokeLink visual-only multiplayer client for Pokemon Z.
-# Loaded before Main by tools/multiplayer/install-multiplayer.js.
+# Loaded before Main by the installed loader or portable SebiLinkBootstrap.
 
 if defined?(Socket) && defined?(Winsock) && !Socket.method_defined?(:sebi_recv_once)
   module Winsock
@@ -19416,6 +19416,8 @@ module SebiLinkHub
       return run_menu_action(_INTL("Menu Trucos abierto.")) { SebiCheats.open_menu if defined?(SebiCheats) }
     when "open_randomizer_menu"
       return run_menu_action(_INTL("Randomizador abierto.")) { SebiRandomizer.open_menu if defined?(SebiRandomizer) }
+    when "check_sebilink_updates"
+      return run_menu_action(_INTL("Busqueda de actualizaciones solicitada.")) { SebiLinkUpdater.check_now if defined?(SebiLinkUpdater) }
     when "wonder_trade_daily"
       return run_menu_action(_INTL("Intercambio prodigio solicitado.")) { SebiSpecialActions.wonder_trade_daily if defined?(SebiSpecialActions) }
     when "random_egg_trade_daily"
@@ -21003,6 +21005,7 @@ module SebiPokeLinkMenu
           _INTL("Controles"),
           _INTL("Ventana SebiLink F12"),
           _INTL("Randomizador"),
+          _INTL("Buscar actualizaciones"),
           _INTL("Salir")
         ]
         cmd = Kernel.pbMessage(_INTL("SebiLink"), commands, commands.length)
@@ -21040,6 +21043,8 @@ module SebiPokeLinkMenu
           SebiLinkHub.open_window if defined?(SebiLinkHub)
         when 12
           SebiRandomizer.open_menu if defined?(SebiRandomizer)
+        when 13
+          SebiLinkUpdater.check_now if defined?(SebiLinkUpdater)
         else
           break
         end
@@ -23789,3 +23794,4 @@ end
 
 # Independent per-save randomizer; loaded after the existing SebiLink hooks.
 load File.join(File.dirname(__FILE__), "SebiRandomizer.rb")
+load File.join(File.dirname(__FILE__), "SebiUpdater.rb")
