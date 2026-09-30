@@ -196,23 +196,34 @@ module SebiLinkFileConfig
   PATH = SebiLinkPaths.config_path("sebilink.ini") rescue "SebiLinkConfig/sebilink.ini"
   LEGACY_PATH = File.join(SebiLinkPaths.multiplayer_dir, "sebilink.ini") rescue "multiplayer/sebilink.ini"
   @values = nil
+  @revision = 0
 
-  def self.load
-    values = {}
-    SebiLinkPaths.migrate_file(LEGACY_PATH, PATH) if defined?(SebiLinkPaths)
-    if FileTest.exist?(PATH)
-      File.open(PATH, "rb") do |file|
-        file.each_line do |line|
-          line = line.gsub(/\r|\n/, "")
-          line = line.sub(/\s*[#;].*$/, "")
-          next if line.strip == ""
-          pair = line.split("=", 2)
-          next if pair.length < 2
-          values[pair[0].strip.downcase] = pair[1].strip
-        end
+  def self.read_values(path)
+    result = {}
+    return result if !FileTest.exist?(path)
+    File.open(path, "rb") do |file|
+      file.each_line do |line|
+        line = line.sub(/\A\357\273\277/, "").strip
+        next if line == "" || line =~ /\A[#;\[]/
+        pair = line.split("=", 2)
+        next if pair.length < 2
+        result[pair[0].strip.downcase] = pair[1].strip
       end
     end
-    @values = values
+    return result
+  end
+
+  def self.load
+    SebiLinkPaths.migrate_file(LEGACY_PATH, PATH) if defined?(SebiLinkPaths)
+    @values = read_values(PATH)
+    @revision = @revision.to_i + 1
+    # Import the old network file once; existing unified keys always win.
+    [SebiLinkPaths.config_path("multiplayer.ini"), File.join(SebiLinkPaths.multiplayer_dir, "multiplayer.ini")].each do |path|
+      read_values(path).each do |key, value|
+        target = key == "name" ? "player_name" : "multiplayer_" + key
+        @values[target] = value if !@values.has_key?(target)
+      end
+    end if !@values.has_key?("config_unified_version")
   rescue Exception
     @values = {}
   end
@@ -252,8 +263,86 @@ module SebiLinkFileConfig
   end
 
   def self.set(key, value)
-    values[key.to_s.downcase] = value == nil ? "" : value.to_s
-    save
+    return set_many({key.to_s.downcase => value})
+  end
+
+  def self.set_many(changes)
+    ensure_dir
+    # Both the game and native windows use this short-lived shared lock.
+    lock_path = PATH + ".lock"
+    deadline = Time.now + 2
+    lock = nil
+    begin
+      begin
+        lock = File.open(lock_path, File::WRONLY | File::CREAT | File::EXCL)
+      rescue Errno::EEXIST
+        begin
+          File.delete(lock_path) if Time.now - File.mtime(lock_path) > 30
+        rescue Errno::ENOENT
+          # Another writer just released the lock; try again.
+        end
+        raise "No se pudo bloquear sebilink.ini" if Time.now >= deadline
+        sleep(0.02)
+        retry
+      end
+      merged = values.merge(read_values(PATH))
+      if !changes.has_key?("config_seeded_keys")
+        seeded = merged["config_seeded_keys"].to_s.split(",")
+        changes.keys.each { |key| seeded.delete(key.to_s.downcase) }
+        merged["config_seeded_keys"] = seeded.sort.join(",")
+      end
+      changes.each do |key, value|
+        name = key.to_s.downcase
+        raise "Clave INI invalida" if name !~ /\A[a-z0-9_]+\z/
+        merged[name] = value == nil ? "" : value.to_s.gsub(/[\r\n]/, " ")
+      end
+      merged["config_unified_version"] = "1"
+      tmp = PATH + ".tmp"
+      File.open(tmp, "wb") do |file|
+        file.write("# SebiLink player settings.\n")
+        file.write("# control_0..15: Abajo, Izquierda, Derecha, Arriba, Aceptar C, Aceptar Enter, Cancelar X, Cancelar Esc, Correr, Turbo, Objeto, Pag abajo, Pag arriba, Curar, Vuelo, Radar.\n")
+        file.write("# randomizer_regions: 1 Kanto, 2 Johto, 3 Hoenn, 4 Sinnoh, 5 Teselia, 6 Kalos, 7 Alola, 8 Galar/Hisui, 9 Paldea.\n")
+        merged.keys.sort.each { |key| file.write(key + "=" + merged[key] + "\n") }
+      end
+      # Windows rename does not replace an existing file. MoveFileEx is atomic.
+      if defined?(Win32API)
+        move = Win32API.new("kernel32", "MoveFileExA", "PPL", "L")
+        raise "No se pudo escribir sebilink.ini" if move.call(tmp, PATH, 9) == 0
+      else
+        File.rename(tmp, PATH)
+      end
+      @values = merged
+      @revision += 1
+      return true
+    ensure
+      lock.close if lock
+      File.delete(lock_path) if lock && FileTest.exist?(lock_path)
+    end
+  end
+
+  def self.option_data(ivar, defaults)
+    @option_cache ||= {}
+    cached = @option_cache[ivar]
+    return cached[1] if cached && cached[0] == @revision && (cached[2] || !$PokemonGlobal)
+    legacy = $PokemonGlobal ? $PokemonGlobal.instance_variable_get(ivar) : nil
+    legacy = {} if !legacy.is_a?(Hash)
+    result = {}
+    missing = {}
+    defaults.each do |key, default_value|
+      if has_key?(key) && !(legacy.has_key?(key) && needs_migration?(key))
+        result[key] = default_value == true || default_value == false ? get_bool(key, default_value) :
+          (default_value == nil ? (get(key, "").to_s == "" ? nil : get_int(key, 0)) : get_int(key, default_value))
+      else
+        result[key] = legacy.has_key?(key) ? legacy[key] : default_value
+        missing[key] = result[key]
+      end
+    end
+    set_many(missing) if !missing.empty? && $PokemonGlobal
+    if $PokemonGlobal && $PokemonGlobal.instance_variable_defined?(ivar)
+      $PokemonGlobal.send(:remove_instance_variable, ivar)
+    end
+    @option_cache[ivar] = [@revision, result, $PokemonGlobal != nil]
+    return result
   end
 
   def self.ensure_dir
@@ -266,15 +355,26 @@ module SebiLinkFileConfig
   end
 
   def self.save
-    ensure_dir
-    keys = values.keys.sort
-    File.open(PATH, "wb") do |file|
-      file.write("# SebiLink runtime settings.\n")
-      for key in keys
-        file.write(key.to_s + "=" + values[key].to_s + "\n")
-      end
-    end
-  rescue Exception
+    return set_many(values)
+  end
+
+  def self.needs_migration?(key)
+    key = key.to_s
+    return true if !has_key?(key)
+    return false if !defined?(SebiSettingsRegistry)
+    return false if !get("config_seeded_keys", "").split(",").include?(key)
+    original = SebiSettingsRegistry.defaults[key]
+    return values[key].to_s == original.to_s
+  end
+
+  def self.fill_defaults(defaults)
+    missing = {}
+    defaults.each { |key, value| missing[key] = value if !has_key?(key) }
+    return false if missing.empty?
+    seeded = get("config_seeded_keys", "").split(",")
+    missing["config_seeded_keys"] = (seeded + missing.keys).uniq.sort.join(",")
+    set_many(missing)
+    return true
   end
 end
 
@@ -1100,26 +1200,13 @@ module SebiVisualMultiplayer
     return value
   end
 
+  # Historical callers now persist only the unified INI.
   def self.save_legacy_config
-    values = @config || {}
-    SebiLinkPaths.ensure_config_dir if defined?(SebiLinkPaths)
-    File.open(legacy_config_path, "wb") do |file|
-      file.write("# SebiPokeLink visual multiplayer for Pokemon Z.\n")
-      file.write("# Managed by the SebiLink in-game menu.\n\n")
-      file.write("enabled=" + (values["enabled"] || "false").to_s + "\n")
-      file.write("host=" + (values["host"] || "").to_s + "\n")
-      file.write("port=" + (values["port"] || "54545").to_s + "\n")
-      file.write("name=" + (values["name"] || "Player").to_s + "\n\n")
-      file.write("send_interval=" + (values["send_interval"] || "1").to_s + "\n")
-      file.write("remote_smoothing=" + (values["remote_smoothing"] || "2").to_s + "\n")
-      file.write("connect_timeout_frames=" + (values["connect_timeout_frames"] || "300").to_s + "\n")
-      file.write("retry_frames=" + (values["retry_frames"] || "600").to_s + "\n")
-      file.write("fade_after=" + (values["fade_after"] || "180").to_s + "\n")
-      file.write("hide_after=" + (values["hide_after"] || "600").to_s + "\n")
-      file.write("pvp_wait_frames=" + (values["pvp_wait_frames"] || "108000").to_s + "\n")
-      file.write("debug=" + (values["debug"] || "false").to_s + "\n")
+    changes = {}
+    (@config || {}).each do |key, value|
+      changes[key == "name" ? "player_name" : "multiplayer_" + key] = value
     end
-  rescue Exception
+    SebiLinkFileConfig.set_many(changes)
   end
 
   def self.save_saved_room(mode, host, port)
@@ -1167,20 +1254,17 @@ module SebiVisualMultiplayer
       "pvp_wait_frames" => "108000",
       "debug" => "false"
     }
-    path = legacy_config_path
-    SebiLinkPaths.migrate_file(old_legacy_config_path, path) if defined?(SebiLinkPaths)
-    if FileTest.exist?(path)
-      File.open(path, "rb") do |file|
-        file.each_line do |line|
-          line = line.gsub(/\r|\n/, "")
-          line = line.sub(/\s*[#;].*$/, "")
-          next if line.strip == ""
-          key_value = line.split("=", 2)
-          next if key_value.length < 2
-          values[key_value[0].strip.downcase] = key_value[1].strip
-        end
-      end
+    values.keys.each do |key|
+      target = key == "name" ? "player_name" : "multiplayer_" + key
+      stored = SebiLinkFileConfig.values[target]
+      values[key] = stored if stored != nil
     end
+    missing = {}
+    values.each do |key, value|
+      target = key == "name" ? "player_name" : "multiplayer_" + key
+      missing[target] = value if !SebiLinkFileConfig.has_key?(target)
+    end
+    SebiLinkFileConfig.set_many(missing) if !missing.empty?
     if defined?(SebiLinkFileConfig)
       mode = raw_file_config_value("multiplayer_mode")
       mode = mode.to_s.strip.downcase if mode != nil
@@ -1252,7 +1336,9 @@ module SebiVisualMultiplayer
   end
 
   def self.set_config_value(key, value)
-    config[key.to_s.downcase] = value.to_s
+    key = key.to_s.downcase
+    config[key] = value.to_s
+    SebiLinkFileConfig.set(key == "name" ? "player_name" : "multiplayer_" + key, value)
   end
 
   def self.set_enabled(value)
@@ -3558,32 +3644,11 @@ end
 
 module SebiLinkOptions
   DATA_IVAR = :@sebi_pokelink_options
-  @fallback_data = nil
-  @loaded_file_config = false
 
   def self.data
-    if !$PokemonGlobal
-      @fallback_data = {} if !@fallback_data.is_a?(Hash)
-      return normalize_data(@fallback_data)
-    end
-    value = $PokemonGlobal.instance_variable_get(DATA_IVAR)
-    value = {} if !value.is_a?(Hash)
-    $PokemonGlobal.instance_variable_set(DATA_IVAR, value)
-    return normalize_data(value)
-  rescue Exception
-    @fallback_data = {} if !@fallback_data.is_a?(Hash)
-    return normalize_data(@fallback_data)
+    return SebiLinkFileConfig.option_data(DATA_IVAR, {:remote_collisions => true})
   end
 
-  def self.normalize_data(value)
-    if !@loaded_file_config && defined?(SebiLinkFileConfig) && SebiLinkFileConfig.has_key?("remote_collisions")
-      value[:remote_collisions] = SebiLinkFileConfig.get_bool("remote_collisions", true)
-    elsif value[:remote_collisions] == nil
-      value[:remote_collisions] = true
-    end
-    @loaded_file_config = true
-    return value
-  end
 
   def self.remote_collisions?
     return data[:remote_collisions] ? true : false
@@ -3680,57 +3745,18 @@ module SebiCheats
   for const_name in LEVEL_CAP_CONSTANTS
     @original_level_caps[const_name] = Object.const_get(const_name.to_sym) if Object.const_defined?(const_name.to_sym)
   end
-  @fallback_data = nil
   @last_level_cap_applied = nil
-  @loaded_file_config = false
 
   def self.const_key(name)
     return name.is_a?(Symbol) ? name : name.to_s.to_sym
   end
 
   def self.data
-    if !$PokemonGlobal
-      @fallback_data = {} if !@fallback_data.is_a?(Hash)
-      return normalize_data(@fallback_data)
-    end
-    value = $PokemonGlobal.instance_variable_get(DATA_IVAR)
-    value = {} if !value.is_a?(Hash)
-    $PokemonGlobal.instance_variable_set(DATA_IVAR, value)
-    return normalize_data(value)
-  rescue Exception
-    @fallback_data = {} if !@fallback_data.is_a?(Hash)
-    return normalize_data(@fallback_data)
+    return SebiLinkFileConfig.option_data(DATA_IVAR, {
+      :wild_shiny_percent => 10, :level_cap_override => nil,
+      :level_cap_default_extra => LEVEL_CAP_VANILLA_EXTRA, :max_repel => false})
   end
 
-  def self.normalize_data(value)
-    if !@loaded_file_config && defined?(SebiLinkFileConfig) && SebiLinkFileConfig.has_key?("wild_shiny_percent")
-      value[:wild_shiny_percent] = SebiLinkFileConfig.get_int("wild_shiny_percent", 10)
-    elsif value[:wild_shiny_percent] == nil
-      value[:wild_shiny_percent] = defined?(SebiLinkFileConfig) ? SebiLinkFileConfig.get_int("wild_shiny_percent", 10) : 10
-    end
-    if !@loaded_file_config && defined?(SebiLinkFileConfig) && SebiLinkFileConfig.has_key?("level_cap_override")
-      stored_cap = SebiLinkFileConfig.get("level_cap_override", "")
-      value[:level_cap_override] = stored_cap.to_s == "" ? nil : stored_cap.to_i
-    elsif !value.has_key?(:level_cap_override)
-      stored_cap = defined?(SebiLinkFileConfig) ? SebiLinkFileConfig.get("level_cap_override", "") : ""
-      value[:level_cap_override] = stored_cap.to_s == "" ? nil : stored_cap.to_i
-    end
-    if !@loaded_file_config && defined?(SebiLinkFileConfig) && SebiLinkFileConfig.has_key?("level_cap_default_extra")
-      value[:level_cap_default_extra] = clamp(SebiLinkFileConfig.get_int("level_cap_default_extra", LEVEL_CAP_VANILLA_EXTRA), LEVEL_CAP_DEFAULT_EXTRA_MIN, LEVEL_CAP_DEFAULT_EXTRA_MAX)
-    elsif value[:level_cap_default_extra] == nil
-      stored_extra = defined?(SebiLinkFileConfig) ? SebiLinkFileConfig.get_int("level_cap_default_extra", LEVEL_CAP_VANILLA_EXTRA) : LEVEL_CAP_VANILLA_EXTRA
-      value[:level_cap_default_extra] = clamp(stored_extra, LEVEL_CAP_DEFAULT_EXTRA_MIN, LEVEL_CAP_DEFAULT_EXTRA_MAX)
-    else
-      value[:level_cap_default_extra] = clamp(value[:level_cap_default_extra], LEVEL_CAP_DEFAULT_EXTRA_MIN, LEVEL_CAP_DEFAULT_EXTRA_MAX)
-    end
-    if !@loaded_file_config && defined?(SebiLinkFileConfig) && SebiLinkFileConfig.has_key?("max_repel")
-      value[:max_repel] = SebiLinkFileConfig.get_bool("max_repel", false)
-    elsif value[:max_repel] == nil
-      value[:max_repel] = defined?(SebiLinkFileConfig) ? SebiLinkFileConfig.get_bool("max_repel", false) : false
-    end
-    @loaded_file_config = true
-    return value
-  end
 
   def self.max_level
     return PBExperience::MAXLEVEL if defined?(PBExperience) && PBExperience.const_defined?(:MAXLEVEL)
@@ -4142,10 +4168,11 @@ module SebiCheats
     end
     params = ChooseNumberParams.new
     params.setRange(1, 99)
-    params.setDefaultValue(2)
+    params.setDefaultValue(clamp(SebiLinkFileConfig.get_int("sacred_ashes_quantity", 2), 1, 99))
     params.setCancelValue(0)
     quantity = Kernel.pbMessageChooseNumber(_INTL("Cantidad de Cenizas Sagradas (1-99)."), params)
     return if quantity <= 0
+    SebiLinkFileConfig.set("sacred_ashes_quantity", quantity)
     item = sacred_ashes_item
     if Kernel.pbReceiveItem(item, quantity)
       Kernel.pbMessage(_INTL("Las Cenizas Sagradas pueden revivir incluso en Nuzlocke."))
@@ -4161,6 +4188,7 @@ module SebiCheats
       return false
     end
     quantity = clamp(quantity.to_i, 1, 999)
+    SebiLinkFileConfig.set("sacred_ashes_quantity", quantity)
     item = sacred_ashes_item
     ok = $PokemonBag.pbStoreItem(item, quantity)
     if ok
@@ -8824,6 +8852,7 @@ module SebiControls
     end
     if missing
       $PokemonSystem.gameControls = Keys.defaultControls
+      @file_controls_system = nil
       @loaded_file_controls = false
     end
     load_file_controls
@@ -8831,11 +8860,36 @@ module SebiControls
   end
 
   def self.load_file_controls
+    return if !$PokemonSystem || !defined?(SebiLinkFileConfig)
+    return if @file_controls_system.equal?($PokemonSystem) && (@file_controls_had_trainer || !$Trainer)
+    controls = $PokemonSystem.gameControls
+    changes = {}
+    controls.each_with_index do |control, index|
+      next if !control
+      key = "control_" + index.to_s
+      if SebiLinkFileConfig.needs_migration?(key)
+        changes[key] = control.keyCode.to_i if $Trainer
+      else
+        code = SebiLinkFileConfig.get_int(key, control.keyCode.to_i)
+        control.keyCode = code if code >= 0 && code <= 65535
+      end
+    end
+    SebiLinkFileConfig.set_many(changes) if !changes.empty?
+    @file_controls_system = $PokemonSystem
+    @file_controls_had_trainer = $Trainer != nil
     @loaded_file_controls = true
   rescue Exception
   end
 
   def self.save_file_controls
+    return if !$PokemonSystem || !defined?(SebiLinkFileConfig)
+    changes = {}
+    $PokemonSystem.gameControls.each_with_index do |control, index|
+      changes["control_" + index.to_s] = control.keyCode.to_i if control
+    end
+    SebiLinkFileConfig.set_many(changes)
+    @file_controls_system = $PokemonSystem
+    @file_controls_had_trainer = $Trainer != nil
   rescue Exception
   end
 
@@ -12525,7 +12579,7 @@ module SebiSavedTeams
     return nil
   end
 
-  def self.choose_team(message = nil)
+  def self.choose_team(message = nil, default_name = nil)
     list = teams
     if list.length == 0
       Kernel.pbMessage(_INTL("No hay equipos guardados todavia. Se abrira el archivo para pegar equipos Showdown."))
@@ -12538,7 +12592,9 @@ module SebiSavedTeams
       commands.push(_INTL("{1} ({2}/6)", team["name"].to_s, count))
     end
     commands.push(_INTL("Cancelar"))
-    cmd = Kernel.pbMessage(message || _INTL("Elige equipo guardado"), commands, commands.length)
+    default_index = 0
+    list.each_with_index { |team, index| default_index = index if team["name"].to_s == default_name.to_s }
+    cmd = Kernel.pbMessage(message || _INTL("Elige equipo guardado"), commands, commands.length, nil, default_index)
     return nil if cmd < 0 || cmd >= list.length
     return list[cmd]
   rescue Exception
@@ -13500,7 +13556,8 @@ module SebiPvpRules
   def self.open_challenge_menu(player)
     return if !player
     rules = current_rules
-    mode = "single"
+    mode = SebiLinkFileConfig.get("pvp_format", "single")
+    mode = "single" if !["single", "double"].include?(mode)
     loop do
       commands = [
         _INTL("Formato: {1}", mode == "double" ? _INTL("2vs2") : _INTL("1vs1")),
@@ -13529,7 +13586,10 @@ module SebiPvpRules
           ["single", "double"],
           mode
         )
-        mode = value if value
+        if value
+          mode = value
+          SebiLinkFileConfig.set("pvp_format", mode)
+        end
       when 1
         value = choose_from(
           _INTL("Origen del equipo temporal."),
@@ -13627,6 +13687,7 @@ module SebiPvpRules
       else
         return
       end
+      save_rules(rules)
     end
   rescue Exception
     Kernel.pbMessage(_INTL("No se pudo abrir la solicitud de combate PvP."))
@@ -20852,8 +20913,12 @@ module SebiSpecialActions
       commands.push(_INTL("{1} - Def/DefEsp {2}", option[1].to_s, option[2].to_i))
     end
     commands.push(_INTL("Cancelar"))
-    cmd = Kernel.pbMessage(_INTL("Elige Pokemon rival de entrenamiento"), commands, commands.length)
+    default_index = 0
+    saved = SebiLinkFileConfig.get("training_species", "WOBBUFFET")
+    options.each_with_index { |option, index| default_index = index if option[0].to_s == saved }
+    cmd = Kernel.pbMessage(_INTL("Elige Pokemon rival de entrenamiento"), commands, commands.length, nil, default_index)
     return nil if cmd < 0 || cmd >= options.length
+    SebiLinkFileConfig.set("training_species", options[cmd][0].to_s)
     return options[cmd]
   rescue Exception
     return nil
@@ -20876,9 +20941,13 @@ module SebiSpecialActions
       _INTL("Gestionar equipos guardados"),
       _INTL("Cancelar")
     ]
-    cmd = Kernel.pbMessage(_INTL("Entrenamiento SebiLink"), commands, commands.length)
-    return "dummy" if cmd == 0
-    return "saved" if cmd == 1
+    default_index = SebiLinkFileConfig.get("training_mode", "dummy") == "saved" ? 1 : 0
+    cmd = Kernel.pbMessage(_INTL("Entrenamiento SebiLink"), commands, commands.length, nil, default_index)
+    if cmd == 0 || cmd == 1
+      mode = cmd == 0 ? "dummy" : "saved"
+      SebiLinkFileConfig.set("training_mode", mode)
+      return mode
+    end
     if cmd == 2
       SebiSavedTeams.open_manager if defined?(SebiSavedTeams)
       return choose_training_mode
@@ -20890,9 +20959,12 @@ module SebiSpecialActions
 
   def self.saved_training_party
     return [nil, nil, _INTL("Equipos guardados no esta disponible.")] if !defined?(SebiSavedTeams)
-    team = SebiSavedTeams.choose_team(_INTL("Elige equipo rival guardado."))
+    team = SebiSavedTeams.choose_team(_INTL("Elige equipo rival guardado."), SebiLinkFileConfig.get("training_saved_team", ""))
     return [nil, nil, nil] if !team
-    attacks = Kernel.pbConfirmMessage(_INTL("Quieres que el entrenador use los ataques reales de ese equipo?"))
+    SebiLinkFileConfig.set("training_saved_team", team["name"].to_s)
+    default_index = SebiLinkFileConfig.get_bool("training_use_attacks", false) ? 0 : 1
+    attacks = Kernel.pbMessage(_INTL("Quieres que el entrenador use los ataques reales de ese equipo?"), [_INTL("Si"), _INTL("No")], 2, nil, default_index) == 0
+    SebiLinkFileConfig.set("training_use_attacks", attacks)
     party, error = SebiSavedTeams.party_from_team(team, !attacks)
     return [party, team, error]
   rescue Exception
@@ -23792,6 +23864,8 @@ at_exit do
   SebiVisualMultiplayer.stop_hosted_server(false) if defined?(SebiVisualMultiplayer)
 end
 
-# Independent per-save randomizer; loaded after the existing SebiLink hooks.
+# Complete catalogue, initialized even before entering an options menu.
+load File.join(File.dirname(__FILE__), "SebiSettingsRegistry.rb")
 load File.join(File.dirname(__FILE__), "SebiRandomizer.rb")
+SebiSettingsRegistry.initialize_all
 load File.join(File.dirname(__FILE__), "SebiUpdater.rb")

@@ -34,6 +34,8 @@ function Copy-SebiLinkLegacyRuntime {
 }
 
 $script:SebiLinkConfigRoot = Get-SebiLinkConfigRoot
+. (Join-Path (Split-Path $PSScriptRoot -Parent) 'SebiLinkSettings.ps1')
+$script:IniPath = Join-Path $script:SebiLinkConfigRoot 'sebilink.ini'
 if (!(Test-Path -LiteralPath $script:SebiLinkConfigRoot)) {
   [void](New-Item -ItemType Directory -Path $script:SebiLinkConfigRoot -Force)
 }
@@ -4199,7 +4201,10 @@ $top.Controls.Add($heal)
 
 $script:AutoRefresh = New-Object System.Windows.Forms.CheckBox
 $script:AutoRefresh.Text = "Auto"
-$script:AutoRefresh.Checked = $false
+$script:AutoRefresh.Checked = Get-SebiSettingBool -Path $script:IniPath -Name 'save_editor_auto_refresh' -Default $false
+$script:AutoRefresh.Add_CheckedChanged({
+  Set-SebiSetting -Path $script:IniPath -Name 'save_editor_auto_refresh' -Value ([string]$script:AutoRefresh.Checked).ToLowerInvariant()
+})
 $script:AutoRefresh.Location = New-Object System.Drawing.Point(642, 18)
 $script:AutoRefresh.Size = New-Object System.Drawing.Size(65, 24)
 Set-Tip $script:AutoRefresh "Desactivado: el editor carga al abrir o al pulsar Refresh."
@@ -5733,7 +5738,10 @@ Set-Tip $script:BagSearch "Filtra objetos por nombre o ID."
 $bagTab.Controls.Add($script:BagSearch)
 $script:BagOwnedOnly = New-Object System.Windows.Forms.CheckBox
 $script:BagOwnedOnly.Text = "Solo con cantidad"
-$script:BagOwnedOnly.Checked = $true
+$script:BagOwnedOnly.Checked = Get-SebiSettingBool -Path $script:IniPath -Name 'save_editor_bag_owned_only' -Default $true
+$script:BagOwnedOnly.Add_CheckedChanged({
+  Set-SebiSetting -Path $script:IniPath -Name 'save_editor_bag_owned_only' -Value ([string]$script:BagOwnedOnly.Checked).ToLowerInvariant()
+})
 $script:BagOwnedOnly.Location = New-Object System.Drawing.Point(360, 16)
 $script:BagOwnedOnly.Size = New-Object System.Drawing.Size(150, 24)
 $script:BagOwnedOnly.Add_CheckedChanged({ if (!$script:LoadingUi) { Refresh-BagTab } })

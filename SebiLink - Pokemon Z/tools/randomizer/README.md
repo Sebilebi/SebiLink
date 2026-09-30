@@ -2,7 +2,10 @@
 
 Implementacion: `multiplayer/SebiRandomizer.rb`, cargada al final del script principal.
 Menu: `SebiLink > Randomizador`, tambien F12/Todas/Trucos. Nueva partida: se ofrece
-antes de la introduccion. Hay que guardar la partida para conservar su configuracion.
+antes de la introduccion. Desde SebiLink 1.1.0 sus opciones se guardan inmediatamente
+en `SebiLinkConfig/sebilink.ini`, compartidas por las partidas del jugador. No hace
+falta guardar la partida para conservar las opciones; Pokemon y resultados generados
+siguen requiriendo guardar la partida normalmente.
 Todas las opciones ON/OFF cambian con un clic; los ajustes numericos mantienen
 su selector. Region usa el mismo funcionamiento de activar/desactivar al seleccionar.
 
@@ -48,7 +51,8 @@ tabla de formas en el constructor. El juego funciona offline con el catalogo loc
 4. Comprobar opciones de entrenador/regente, regalos, fosiles, tutor, MT,
    movimientos, habilidades, stock/precios y objetos. Desactivar una categoria
    conserva la regla original de esa categoria. Los NPC conservan la peticion.
-5. Guardar/reabrir y alternar partidas: cada una debe recuperar sus propios ajustes.
+5. Cambiar opciones y cerrar/reabrir sin guardar: deben conservarse en el INI.
+   Alternar partidas mantiene las mismas opciones del jugador.
    Desactivar todo restaura futuras lecturas/generaciones; no deshace especies,
    objetos o ataques que ya fueron entregados/aprendidos.
 6. En una nueva partida de prueba, aceptar la configuracion inicial y verificar

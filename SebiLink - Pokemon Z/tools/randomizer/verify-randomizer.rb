@@ -77,7 +77,7 @@ end
 module Kernel
   class << self
     attr_accessor :answers, :messages, :confirm_answer
-    def pbMessage(text, commands=nil, _cancel=nil)
+    def pbMessage(text, commands=nil, _cancel=nil, *_options)
       (@messages ||= []) << [text, commands]
       return nil if !commands
       answer = (@answers ||= []).shift

@@ -20,9 +20,11 @@ Write-Host "SebiLink servidor multijugador"
 Write-Host "Puerto: $Port"
 if ($TailscaleIp) {
   Write-Host "IP Tailscale de este PC: $TailscaleIp"
-  Write-Host "Los otros jugadores deben poner en SebiLinkConfig\multiplayer.ini o unirse desde el menu SebiLink:"
-  Write-Host "host=$TailscaleIp"
-  Write-Host "port=$Port"
+  Write-Host "Los otros jugadores deben poner en SebiLinkConfig\sebilink.ini o unirse desde el menu SebiLink:"
+  Write-Host "multiplayer_mode=join"
+  Write-Host "multiplayer_enabled=true"
+  Write-Host "join_host=$TailscaleIp"
+  Write-Host "join_port=$Port"
 } else {
   Write-Host "No he podido detectar una IP de Tailscale. Abre Tailscale y comprueba que esta conectado."
 }

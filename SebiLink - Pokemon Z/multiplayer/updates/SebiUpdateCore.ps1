@@ -100,7 +100,7 @@ function Assert-SebiManifest {
     $total += [long]$entry.bytes
   }
   if ($total -gt 67108864) { throw 'El complemento supera el limite de descarga.' }
-  foreach ($path in @('mkxp.json','multiplayer/SebiVisualMultiplayer.rb','multiplayer/SebiLinkBootstrap.rb','multiplayer/SebiRandomizer.rb','multiplayer/SebiUpdater.rb','multiplayer/updates/update-source.json','multiplayer/updates/SebiUpdateCore.ps1','multiplayer/updates/SebiUpdateWorker.ps1')) {
+  foreach ($path in @('mkxp.json','multiplayer/SebiVisualMultiplayer.rb','multiplayer/SebiLinkBootstrap.rb','multiplayer/SebiRandomizer.rb','multiplayer/SebiSettingsRegistry.rb','multiplayer/SebiLinkSettings.ps1','multiplayer/SebiUpdater.rb','multiplayer/updates/update-source.json','multiplayer/updates/SebiUpdateCore.ps1','multiplayer/updates/SebiUpdateWorker.ps1')) {
     if (!$seen.ContainsKey($path)) { throw "Falta un archivo obligatorio: $path" }
   }
 }

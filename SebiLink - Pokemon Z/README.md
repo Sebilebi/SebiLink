@@ -1,6 +1,6 @@
 # SebiLink - Pokemon Z
 
-**Version SebiLink: 1.0.0.**
+**Version SebiLink: 1.1.1.**
 
 Complemento para **Pokemon Z V2.18 de ericlostie, Windows/MKXP**.
 Esta carpeta contiene el codigo de SebiLink y su configuracion de arranque.
@@ -42,7 +42,12 @@ las nueve generaciones. `Formas regionales`, `Pokemon propios de Z` y `Formas
 propias de Z` se controlan por separado. Con salvajes activados cada encuentro
 hace un sorteo independiente; puede repetirse una especie por azar.
 Se ofrece activar/configurar el randomizador antes de elegir el inicial en una
-partida nueva. Sus reglas pertenecen a cada partida y se conservan al guardarla.
+partida nueva. Todas sus opciones se guardan al cambiarlas en
+`SebiLinkConfig/sebilink.ini`, junto al resto de ajustes de SebiLink. Son opciones
+del jugador, compartidas por sus partidas; cargar otra partida mantiene las reglas
+del INI. Al cargar por primera vez una partida antigua, importa las opciones que
+todavia no existan en el INI. Los Pokemon, iniciales elegidos y resultados de MT
+ya generados siguen siendo datos de la partida.
 
 ## Multijugador e IA
 
@@ -98,7 +103,11 @@ Las copias antiguas sin actualizador necesitan copiar este paquete una primera v
 Para actualizar, cierra el juego y vuelve a copiar el contenido del complemento.
 Configuraciones, snapshots, chats, logs y respaldos se generan localmente en
 `%USERPROFILE%/Saved Games/Pokemon Z/SebiLinkConfig`; no forman parte del paquete.
-Las partidas mantienen su ubicacion original. No subas esos datos al repositorio.
+Las partidas mantienen su ubicacion original. Toda la configuracion del jugador
+(multijugador, controles, trucos, PvP, IA, slots, preferencias de ventanas y
+randomizador) se guarda en un unico `SebiLinkConfig/sebilink.ini`. El antiguo
+`multiplayer.ini` solo se importa una vez y ya no se escribe. Desde 1.1.1, el INI incluye desde el arranque las 128 preferencias, aunque no hayas abierto sus menus: 36 randomizer_*, 16 control_0..15 originales, tres extra_control_*, nueve slots y todas sus opciones. Se migran los ajustes de partidas antiguas sin reemplazar elecciones existentes del INI. No hace falta guardar
+la partida para conservar un cambio de opciones. No subas esos datos al repositorio.
 
 Para desactivar SebiLink en una instalacion original, restaura tu `mkxp.json`
 anterior o elimina `multiplayer/SebiLinkBootstrap.rb` de `preloadScript` y vuelve

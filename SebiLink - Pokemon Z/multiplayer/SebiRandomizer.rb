@@ -1,4 +1,4 @@
-# SebiLink randomizer for Pokemon Z. RGSS compatible; no changes to compiled PBS.
+# SebiLink randomizer for Pokemon Z. Player preferences live in sebilink.ini.
 module SebiRandomizer
   REGIONS = ["Kanto (Gen. 1)", "Johto (Gen. 2)", "Hoenn (Gen. 3)",
     "Sinnoh (Gen. 4)", "Teselia (Gen. 5)", "Kalos (Gen. 6)",
@@ -60,7 +60,66 @@ module SebiRandomizer
 
   def self.state
     return nil if !$PokemonGlobal
-    return $PokemonGlobal.instance_variable_get("@sebi_randomizer")
+    saved = $PokemonGlobal.instance_variable_get("@sebi_randomizer")
+    return saved if !defined?(SebiLinkFileConfig) # Standalone offline compatibility.
+    return @settings if @settings_global.equal?($PokemonGlobal)
+    return nil if !saved && !SebiLinkFileConfig.has_key?("randomizer_enabled")
+    settings = defaults
+    missing = {}
+    option_keys.each do |key|
+      ini_key = "randomizer_" + key
+      if key == "enabled" && !saved && SebiLinkFileConfig.needs_migration?(ini_key) && $game_switches && defined?(RandomizedChallenge) && $game_switches[RandomizedChallenge::SWITCH]
+        settings[key] = true
+        missing[ini_key] = true
+      elsif SebiLinkFileConfig.has_key?(ini_key) && !(saved.is_a?(Hash) && saved.has_key?(key) && SebiLinkFileConfig.needs_migration?(ini_key))
+        original = settings[key]
+        settings[key] = if key == "regions"
+          SebiLinkFileConfig.get(ini_key, "").split(",").map { |v| v.to_i }.select { |v| v >= 1 && v <= 9 }.uniq.sort
+        elsif original == true || original == false
+          SebiLinkFileConfig.get_bool(ini_key, original)
+        else
+          SebiLinkFileConfig.get_int(ini_key, original)
+        end
+      else
+        settings[key] = saved[key] if saved.is_a?(Hash) && saved.has_key?(key)
+        missing[ini_key] = key == "regions" ? settings[key].join(",") : settings[key]
+      end
+    end
+    settings["regions"] = [1,2,3,4,5,6,7,8,9] if settings["regions"].empty?
+    %w[first_evolution second_evolution].each { |k| settings[k] = [[settings[k].to_i, 1].max, 100].min }
+    %w[price_min price_max].each { |k| settings[k] = [[settings[k].to_i, 1].max, 99999].min }
+    settings["second_evolution"] = [settings["first_evolution"], settings["second_evolution"]].max
+    settings["price_max"] = [settings["price_min"], settings["price_max"]].max
+    SebiLinkFileConfig.set_many(missing) if !missing.empty?
+    # These are generated game results, never player preferences.
+    runtime = saved.is_a?(Hash) ? saved : {}
+    runtime["tm_map"] = {} if !runtime["tm_map"].is_a?(Hash)
+    runtime["egg_map"] = {} if !runtime["egg_map"].is_a?(Hash)
+    runtime["starters"] = [] if !runtime["starters"].is_a?(Array)
+    option_keys.each { |key| runtime.delete(key) }
+    $PokemonGlobal.instance_variable_set("@sebi_randomizer", runtime)
+    %w[tm_map egg_map starters].each { |key| settings[key] = runtime[key] }
+    @settings_global = $PokemonGlobal
+    @settings = settings
+    @pools = {}
+    if $game_switches && defined?(RandomizedChallenge)
+      $game_switches[RandomizedChallenge::SWITCH] = settings["enabled"] && settings["starter"]
+    end
+    return settings
+  end
+
+  def self.option_keys
+    @option_keys ||= defaults.keys - %w[tm_map egg_map starters revision]
+    return @option_keys
+  end
+
+  def self.persist_preferences
+    return if !defined?(SebiLinkFileConfig)
+    changes = {}
+    option_keys.each do |key|
+      changes["randomizer_" + key] = key == "regions" ? state[key].join(",") : state[key]
+    end
+    SebiLinkFileConfig.set_many(changes)
   end
 
   def self.manage
@@ -207,6 +266,15 @@ module SebiRandomizer
       Kernel.pbMessage(_INTL("Ese ajuste deja un filtro sin Pokemon o un rango invalido. Se mantiene el anterior."))
       return false
     end
+    begin
+      persist_preferences
+    rescue StandardError => error
+      s[key] = old
+      s["revision"] += 1
+      @pools = {}
+      Kernel.pbMessage(_INTL("No se pudo guardar el ajuste en sebilink.ini: {1}", error.message))
+      return false
+    end
     apply_tm_moves
     generate_starters if %w[regions regional_forms custom_species custom_forms progression first_evolution second_evolution starter gift_legendary gift_mythical].include?(key)
     if $game_switches && defined?(RandomizedChallenge)
@@ -270,7 +338,7 @@ module SebiRandomizer
       commands = [_INTL("Randomizador: {1}", status(state["enabled"]))]
       commands.concat(GROUPS.map { |g| _INTL(g[0]) })
       commands.push(_INTL("Region ({1}/9)", state["regions"].length), _INTL("Volver"))
-      chosen = Kernel.pbMessage(_INTL("Randomizador SebiLink\nSalvajes: sorteo nuevo en cada encuentro.\nAjustes de esta partida; guarda para conservarlos."), commands, commands.length)
+      chosen = Kernel.pbMessage(_INTL("Randomizador SebiLink\nSalvajes: sorteo nuevo en cada encuentro.\nOpciones del jugador: se guardan al cambiarlas en sebilink.ini."), commands, commands.length)
       if chosen == 0
         if !state["enabled"]
           generate_starters if state["starters"].empty?
@@ -293,6 +361,8 @@ module SebiRandomizer
       change("enabled", true)
       generate_starters
       open_menu
+    else
+      change("enabled", false)
     end
   end
 
@@ -306,6 +376,9 @@ module SebiRandomizer
       $game_variables[var] = row[0]
     end
     state["starters"] = choices
+    if defined?(SebiLinkFileConfig)
+      $PokemonGlobal.instance_variable_get("@sebi_randomizer")["starters"] = choices
+    end
   end
 
   def self.vanilla_starter(index)

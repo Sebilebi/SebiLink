@@ -1441,7 +1441,14 @@ $quickPage.Add_Enter({
   Request-PreviewForQuickRow
 })
 
-$topMostCheck.Add_CheckedChanged({ $script:Form.TopMost = $topMostCheck.Checked })
+. (Join-Path (Split-Path $PSScriptRoot -Parent) 'SebiLinkSettings.ps1')
+$script:IniPath = Join-Path $script:SebiLinkConfigRoot 'sebilink.ini'
+$topMostCheck.Checked = Get-SebiSettingBool -Path $script:IniPath -Name 'save_manager_topmost' -Default $false
+$script:Form.TopMost = $topMostCheck.Checked
+$topMostCheck.Add_CheckedChanged({
+  $script:Form.TopMost = $topMostCheck.Checked
+  Set-SebiSetting -Path $script:IniPath -Name 'save_manager_topmost' -Value ([string]$topMostCheck.Checked).ToLowerInvariant()
+})
 if ($script:StartOnQuickTab) {
   $script:MainTabs.SelectedTab = $quickPage
 } else {

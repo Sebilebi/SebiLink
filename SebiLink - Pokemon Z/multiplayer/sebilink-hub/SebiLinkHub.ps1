@@ -143,60 +143,16 @@ function New-HubAction {
   }
 }
 
+. (Join-Path $script:MultiplayerDir 'SebiLinkSettings.ps1')
+
 function Get-HubIniValue {
-  param(
-    [string]$Name,
-    [string]$Default
-  )
-  try {
-    if (!(Test-Path -LiteralPath $script:IniPath)) { return $Default }
-    foreach ($line in Get-Content -LiteralPath $script:IniPath) {
-      $trimmed = $line.Trim()
-      if ($trimmed.Length -eq 0 -or $trimmed.StartsWith("#")) { continue }
-      $eq = $trimmed.IndexOf("=")
-      if ($eq -le 0) { continue }
-      $key = $trimmed.Substring(0, $eq).Trim()
-      if ($key -ieq $Name) {
-        return $trimmed.Substring($eq + 1).Trim()
-      }
-    }
-  } catch {
-  }
-  return $Default
+  param([string]$Name, [string]$Default)
+  return Get-SebiSetting -Path $script:IniPath -Name $Name -Default $Default
 }
 
 function Set-HubIniValue {
-  param(
-    [string]$Name,
-    [string]$Value
-  )
-  try {
-    $lines = @()
-    if (Test-Path -LiteralPath $script:IniPath) {
-      $lines = @(Get-Content -LiteralPath $script:IniPath)
-    } else {
-      $lines = @("# SebiLink runtime settings.")
-    }
-    $updated = $false
-    for ($i = 0; $i -lt $lines.Count; $i++) {
-      $line = [string]$lines[$i]
-      $trimmed = $line.Trim()
-      if ($trimmed.Length -eq 0 -or $trimmed.StartsWith("#")) { continue }
-      $eq = $trimmed.IndexOf("=")
-      if ($eq -le 0) { continue }
-      $key = $trimmed.Substring(0, $eq).Trim()
-      if ($key -ieq $Name) {
-        $lines[$i] = $Name + "=" + $Value
-        $updated = $true
-        break
-      }
-    }
-    if (!$updated) {
-      $lines += ($Name + "=" + $Value)
-    }
-    [System.IO.File]::WriteAllLines($script:IniPath, [string[]]$lines, $script:Utf8NoBom)
-  } catch {
-  }
+  param([string]$Name, [string]$Value)
+  Set-SebiSetting -Path $script:IniPath -Name $Name -Value $Value
 }
 
 function Get-HubIniInt {
@@ -2267,7 +2223,8 @@ function New-TricksQuickPanel {
   $shinyDefault = Get-HubIniInt -Name "wild_shiny_percent" -Default 10
 
   $capBox = New-QuickNumber -Minimum 0 -Maximum 999 -Value $capDefault -Width 64
-  $ashesBox = New-QuickNumber -Minimum 1 -Maximum 999 -Value 2 -Width 64
+  $ashesBox = New-QuickNumber -Minimum 1 -Maximum 999 -Value (Get-HubIniInt -Name 'sacred_ashes_quantity' -Default 2) -Width 64
+  $ashesBox.Add_ValueChanged({ Set-HubIniValue -Name 'sacred_ashes_quantity' -Value ([string][int]$ashesBox.Value) }.GetNewClosure())
   $shinyBox = New-QuickNumber -Minimum 0 -Maximum 100 -Value $shinyDefault -Width 58
 
   [void]$flow.Controls.Add((New-QuickLabel -Text "Cap" -Width 30))
@@ -2411,6 +2368,7 @@ function New-AiTab {
   [void]$script:AiModelCombo.Items.AddRange([object[]]@("Auto", "gpt-5.5", "gpt-5.4", "gpt-5", "gpt-5-codex"))
   $savedModel = Get-HubIniValue -Name "codex_ai_model" -Default ""
   $script:AiModelCombo.Text = if ([string]::IsNullOrWhiteSpace($savedModel)) { "Auto" } else { $savedModel }
+  $script:AiModelCombo.Add_TextChanged({ Set-HubIniValue -Name 'codex_ai_model' -Value (Get-AiSelectedModel) })
   [void]$settings.Controls.Add($script:AiModelCombo, 1, 0)
 
   $reasoningLabel = New-Object System.Windows.Forms.Label
@@ -2424,6 +2382,7 @@ function New-AiTab {
   $script:AiReasoningCombo.DropDownStyle = [System.Windows.Forms.ComboBoxStyle]::DropDown
   [void]$script:AiReasoningCombo.Items.AddRange([object[]]@("Auto", "bajo", "medio", "alto", "extremadamente alto", "none", "minimal", "low", "medium", "high", "xhigh"))
   $script:AiReasoningCombo.Text = Get-HubIniValue -Name "codex_ai_reasoning" -Default "medio"
+  $script:AiReasoningCombo.Add_TextChanged({ Set-HubIniValue -Name 'codex_ai_reasoning' -Value (Get-AiSelectedReasoning) })
   [void]$settings.Controls.Add($script:AiReasoningCombo, 3, 0)
 
   $script:AiNewChatButton = New-Object System.Windows.Forms.Button
@@ -2637,7 +2596,12 @@ $script:StatusLabel.Font = New-Object System.Drawing.Font("Segoe UI", 8.5)
 $script:StatusLabel.Text = ("{0} acciones disponibles. Tab Todas abierto por defecto." -f $script:Actions.Count)
 $root.Controls.Add($script:StatusLabel, 0, 2)
 
-$topMostCheck.Add_CheckedChanged({ $form.TopMost = $topMostCheck.Checked })
+$topMostCheck.Checked = Get-HubIniBool -Name 'hub_topmost' -Default $false
+$form.TopMost = $topMostCheck.Checked
+$topMostCheck.Add_CheckedChanged({
+  $form.TopMost = $topMostCheck.Checked
+  Set-HubIniValue -Name 'hub_topmost' -Value ([string]$topMostCheck.Checked).ToLowerInvariant()
+})
 
 Initialize-GameMonitor
 
