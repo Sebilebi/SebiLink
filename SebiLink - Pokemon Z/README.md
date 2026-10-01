@@ -1,6 +1,6 @@
 # SebiLink - Pokemon Z
 
-**Version SebiLink: 1.1.1.**
+**Version SebiLink: 1.7.2.**
 
 Complemento para **Pokemon Z V2.18 de ericlostie, Windows/MKXP**.
 Esta carpeta contiene el codigo de SebiLink y su configuracion de arranque.
@@ -32,6 +32,7 @@ Si ya has personalizado scripts/menu con otros mods, la compatibilidad no esta g
 | Menu/controles | SebiLink integrado, guia F12, teclas extra configurables, PokemonDB y efectividades |
 | Pokemon/combate | Centro Pokemon, PC, tiendas/NPC, cambios de forma/habilidad, entrenamiento, equipos Showdown, ayudas y trucos |
 | Guardados | SebiHeX F7, gestor F8, slots rapidos y respaldos automaticos |
+| Historial | Encuentros, capturas, derrotas, muertes/debilitamientos, objetos y compras con fecha, ruta e IDs persistentes |
 | Multijugador | Salas, jugadores en mapa, seguidores/seguimiento, marcadores, intercambios, PvP y espectador integrado |
 | IA opcional | Chat, consejo de combate, analisis de equipo/postcombate y preparacion PvP mediante un puente CodeXRay propio |
 | Randomizador | Salvajes por encuentro, entrenadores/regentes, iniciales, fosiles, NPC/regalos, habilidades, ataques/MT/tutores, objetos/precios y filtros |
@@ -48,6 +49,127 @@ del jugador, compartidas por sus partidas; cargar otra partida mantiene las regl
 del INI. Al cargar por primera vez una partida antigua, importa las opciones que
 todavia no existan en el INI. Los Pokemon, iniciales elegidos y resultados de MT
 ya generados siguen siendo datos de la partida.
+
+## Historial de actividad
+
+Se registra automaticamente la actividad nueva en
+`Saved Games/Pokemon Z/SebiLinkConfig/Historial/historial.sebilog`, dentro del perfil del jugador.
+Todos sus archivos se agrupan dentro de `Historial/`: registros cifrados, claves,
+backups antiguos, diagnosticos, cola `history-pending/`, codigo `history-viewer/`
+y `Ver historial SebiLink.bat`. Los archivos sueltos de versiones anteriores
+se mueven automaticamente conservando sus bytes. Si estan en uso o hay archivos
+distintos con el mismo nombre, se detiene la migracion sin sobrescribirlos.
+El INI de opciones sigue en `SebiLinkConfig/sebilink.ini`.
+El archivo esta cifrado con AES-256-CBC y autenticado con HMAC-SHA256. Cada
+historial tiene claves aleatorias independientes, cifradas para el administrador
+con RSA-3072/OAEP y guardadas dentro del propio archivo. Cada evento usa un IV
+nuevo y autentica la secuencia y el evento anterior.
+Editar el archivo a mano produce un error de integridad; no se aceptan datos alterados.
+
+Todos los jugadores que instalen este paquete empiezan a registrar sin elegir
+una contrasena. `multiplayer/activity-public-key.txt` contiene solo la clave
+publica del administrador (XML RSA); puede publicarse en GitHub y mantenerse en
+futuras versiones. No regenerarla en cada release. Ninguna contrasena ni clave
+privada forma parte del paquete o del INI. `historial.key` es la clave/checkpoint
+local protegido con DPAPI para poder seguir escribiendo automaticamente.
+
+El jugador puede entregar **solo `historial.sebilog`** al administrador. Desde
+`SebiLink > Ver registros`, `F12 > Sistema > Ver registros` o el ejecutable
+`Ver historial SebiLink.bat`, creado junto al historial dentro de `Historial/`,
+se abre el visor. No hace falta iniciar el juego. El administrador usa su
+`historial-admin.sebikey` y su misma contrasena
+para leer los historiales de todos, sin pedir ninguna contrasena a los jugadores.
+Si su clave no esta en la carpeta habitual, el visor permite seleccionarla.
+Muestra el contenido verificado en una ventana de solo lectura; no escribe
+una exportacion descifrada en disco. La clave privada se protege con AES/HMAC
+y PBKDF2-SHA256 (250.000 iteraciones y sal aleatoria).
+
+El visor tiene tabla ordenable por columnas, busqueda en todos los datos y
+filtros combinables por ID, evento, ruta y fechas. Seleccionar una fila muestra
+todos los campos, Pokemon enviados/recibidos, movimientos, habilidades,
+valores anteriores/nuevos y atributos adicionales en un arbol de detalle y
+en los datos originales. `Abrir historial` permite consultar archivos recibidos
+de otros jugadores; `Recargar` vuelve a leerlo y pide otra vez la contrasena.
+Las fechas de la tabla usan la hora local del Windows que abre el visor; la
+fecha y zona originales permanecen completas en el detalle.
+La columna `Fecha y hora` incluye segundos. Los registros antiguos con el
+nombre de zona horaria de MKXP se muestran usando su fecha y hora locales
+guardadas; los nuevos usan un desfase numerico. Los accesos desde el juego,
+F12 y el BAT abren el mismo visor con sus filtros y detalle completos.
+
+El acceso directo y `history-viewer/` contienen solo codigo publico del visor,
+sin contrasenas ni material de claves privadas. Se crean/actualizan al iniciar
+el escritor de historial y al abrir Ver registros. No necesitan permisos de
+administrador. La clave privada cifrada se conserva por separado: sin ese
+archivo y la contrasena correcta no se abre un historial universal.
+
+**Administrador: conserva una copia privada de `historial-admin.sebikey`.**
+La contrasena permite abrir esa clave; si se pierde el archivo, la contrasena
+sola no recupera los historiales. Nunca incluirlo en GitHub ni enviarlo junto al mod.
+Cada evento conserva fecha/hora local con zona horaria, ruta/coordenadas,
+entrenador y archivo de partida. Si el helper no puede escribir, muestra un error
+al abrir el historial y mantiene eventos pendientes solo en memoria hasta poder
+cifrarlos. Cerrar el juego antes de resolver ese error puede perder los pendientes.
+
+Cada Pokemon tiene un ID propio: dos capturas de la misma especie son distintas;
+encuentro, captura y muerte comparten el mismo ID. Se conserva con el guardado
+normal del Pokemon. Los eventos incluyen sus movimientos/PP, habilidad, nivel,
+forma, IVs/EVs, stats, naturaleza, objeto, shiny, datos de origen y atributos
+adicionales del juego. La fecha de captura queda asociada al Pokemon.
+
+Eventos: `wild_encounter`, `pokemon_captured`, `wild_defeated`, `wild_result`,
+`pokemon_death`, `pokemon_fainted`, `item_obtained` e `item_purchased`.
+Tambien se registran `setting_changed`, `settings_snapshot`, `pokemon_healed`,
+`pokemon_traded`, `item_used`, `sebilink_option_selected` y las acciones
+iniciadas/finalizadas de SebiLink, F12, SebiHeX y carga de partidas.
+Los cambios del INI incluyen campo, valor anterior/nuevo y fecha/hora: por
+ejemplo, probabilidad shiny `1%` a `10%`, activar/desactivar randomizador,
+regiones, controles y preferencias de ventanas. No se generan cambios falsos
+al guardar el mismo valor. La observacion del archivo tambien registra cambios
+externos visibles mientras el juego esta abierto, sin sustituir los registros
+exactos de las interfaces.
+Las ventanas nativas guardan los cambios en una cola temporal cifrada con DPAPI,
+`Historial/history-pending/*.audit`; el juego los incorpora al mismo historial universal
+y solo entonces elimina la cola. Se conserva la hora real del cambio y se
+adjunta por separado el contexto del juego observado al incorporarlo. No se
+escriben colas de eventos en texto plano. El visor sigue siendo de solo lectura;
+no incluye ninguna opcion para editar registros antiguos, incluso con contrasena.
+Un usuario con control de su Windows puede borrar archivos o modificar el juego
+y sus claves locales: el cifrado local no garantiza un sistema antitrampas.
+
+Curaciones: Pokemon/ID completos, PS, estado y PP anteriores/posteriores,
+ruta/coordenadas y origen (juego, Centro Pokemon SebiLink u objeto). Incluye
+recuperaciones parciales y el intento de curar cuando ya estaba completamente
+curado; los huevos no producen curaciones falsas. Intercambios normales,
+multijugador, prodigiosos y de huevo: datos completos del Pokemon entregado
+y recibido, IDs distintos, interlocutor, origen y fecha. Las acciones tambien
+conservan cambios reales en Pokemon del PC, inventario, dinero y resultado.
+El resultado de cada salvaje indica `captured`, `defeated`, `escaped` o
+`not_captured`. Capturas descartadas se registran con `retained=false`.
+La muerte permanente se distingue del debilitamiento normal; PvP/entrenamiento
+sin muerte permanente se registra como debilitamiento. Tambien detecta PS a cero
+fuera de combate en Pokemon del equipo.
+
+Objetos: ID/nombre, cantidad realmente recibida y origen (`ground`, `gift`,
+`game`, `shop`). Compras: cantidad, precio total/unitario y `via=game` o
+`via=sebilink`, con la tienda original seleccionada cuando se abre desde SebiLink.
+Compras canceladas o revertidas por mochila llena no se registran como compras;
+las Honor Balls extra se registran como regalos de la tienda.
+
+El historial se anade en el momento del evento y no retrocede al cargar un save
+anterior. No reconstruye capturas antiguas ni modifica partidas para crear registros.
+IDs nuevos quedan persistidos cuando guardas normalmente. El archivo es local,
+puede incluir datos personales y no forma parte del paquete ni de GitHub.
+
+Un historial anterior `historial.jsonl` se cifra y comprueba antes de quitar la
+copia en claro. Los archivos con cifrado personal de versiones anteriores se
+conservan; para migrarlos se requiere la contrasena anterior, no se sobrescriben.
+No se reemplaza silenciosamente una clave existente. Respaldar juntos `.sebilog` y `.key` conserva
+el checkpoint que tambien detecta la eliminacion de registros finales. Una copia
+sin checkpoint puede verificar la cadena conservada, pero no demostrar que faltan
+eventos finales. Alguien con control de la cuenta de Windows puede extraer claves,
+borrar/restaurar archivos o modificar el juego: esta es proteccion local frente a
+lectura/edicion directa, no una prueba inviolable contra trampas.
 
 ## Multijugador e IA
 

@@ -286,6 +286,7 @@ module SebiLinkFileConfig
         retry
       end
       merged = values.merge(read_values(PATH))
+      audit_before = merged.clone
       if !changes.has_key?("config_seeded_keys")
         seeded = merged["config_seeded_keys"].to_s.split(",")
         changes.keys.each { |key| seeded.delete(key.to_s.downcase) }
@@ -313,6 +314,7 @@ module SebiLinkFileConfig
       end
       @values = merged
       @revision += 1
+      SebiActivityLog.settings_changed(audit_before, merged, "game") if defined?(SebiActivityLog)
       return true
     ensure
       lock.close if lock
@@ -19479,6 +19481,8 @@ module SebiLinkHub
       return run_menu_action(_INTL("Randomizador abierto.")) { SebiRandomizer.open_menu if defined?(SebiRandomizer) }
     when "check_sebilink_updates"
       return run_menu_action(_INTL("Busqueda de actualizaciones solicitada.")) { SebiLinkUpdater.check_now if defined?(SebiLinkUpdater) }
+    when "open_activity_log"
+      return run_menu_action(_INTL("Historial abierto.")) { SebiActivityLog.open_file if defined?(SebiActivityLog) }
     when "wonder_trade_daily"
       return run_menu_action(_INTL("Intercambio prodigio solicitado.")) { SebiSpecialActions.wonder_trade_daily if defined?(SebiSpecialActions) }
     when "random_egg_trade_daily"
@@ -20174,7 +20178,11 @@ module SebiPokemonCenter
       Kernel.pbMessage(_INTL("Esta tienda no tiene stock valido."))
       return
     end
-    pbPokemonMart(shop["stock"])
+    if defined?(SebiActivityLog)
+      SebiActivityLog.context({ "via" => "sebilink", "shop" => shop }) { pbPokemonMart(shop["stock"]) }
+    else
+      pbPokemonMart(shop["stock"])
+    end
   rescue Exception
     Kernel.pbMessage(_INTL("No se pudo abrir la tienda: {1}", $!.message.to_s))
   end
@@ -20204,6 +20212,8 @@ module SebiPokemonCenter
       receive_name = PBSpecies.getName(random_received.species)
     end
     return if !Kernel.pbConfirmMessage(_INTL("Intercambiar {1} por {2} Nv. {3}?", give_name, receive_name, level))
+    activity_sent = SebiActivityLog.pokemon_data($Trainer.party[0]) if defined?(SebiActivityLog)
+    activity_owned = SebiActivityLog.owned_pokemon if defined?(SebiActivityLog)
     if !pbRemovePokemonAt(0)
       Kernel.pbMessage(_INTL("No se pudo retirar a {1}. Necesitas conservar al menos otro Pokemon util.", give_name))
       return
@@ -20213,6 +20223,12 @@ module SebiPokemonCenter
       SebiRandomizer.context("npc_trade") { pbAddPokemon(random_received || receive_sym, level) }
     else
       pbAddPokemon(receive_sym, level)
+    end
+    if defined?(SebiActivityLog)
+      received = (SebiActivityLog.owned_pokemon - activity_owned).first
+      SebiActivityLog.write(received ? "pokemon_traded" : "pokemon_trade_failed", { "sent" => activity_sent,
+        "received" => SebiActivityLog.pokemon_data(received), "source" => "sebilink_npc_trade",
+        "trade" => SebiActivityLog.attributes(trade), "completed" => received != nil })
     end
     Kernel.pbMessage(_INTL("Intercambio completado: recibiste a {1}.", receive_name))
   rescue Exception
@@ -21078,6 +21094,7 @@ module SebiPokeLinkMenu
           _INTL("Ventana SebiLink F12"),
           _INTL("Randomizador"),
           _INTL("Buscar actualizaciones"),
+          _INTL("Ver registros"),
           _INTL("Salir")
         ]
         cmd = Kernel.pbMessage(_INTL("SebiLink"), commands, commands.length)
@@ -21117,6 +21134,8 @@ module SebiPokeLinkMenu
           SebiRandomizer.open_menu if defined?(SebiRandomizer)
         when 13
           SebiLinkUpdater.check_now if defined?(SebiLinkUpdater)
+        when 14
+          SebiActivityLog.open_file if defined?(SebiActivityLog)
         else
           break
         end
@@ -23868,4 +23887,5 @@ end
 load File.join(File.dirname(__FILE__), "SebiSettingsRegistry.rb")
 load File.join(File.dirname(__FILE__), "SebiRandomizer.rb")
 SebiSettingsRegistry.initialize_all
+load File.join(File.dirname(__FILE__), "SebiActivityLog.rb")
 load File.join(File.dirname(__FILE__), "SebiUpdater.rb")

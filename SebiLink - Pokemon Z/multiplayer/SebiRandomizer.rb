@@ -893,8 +893,21 @@ class PokemonLoad
     def pbStartLoadScreen(*args)
       result = sebi_randomizer_load_screen(*args)
       SebiRandomizer.apply_tm_moves
-      SebiRandomizer.new_game_setup
       return result
+    end
+  end
+end
+
+if defined?(Scene_Map)
+  class Scene_Map
+    unless method_defined?(:sebi_randomizer_map_update)
+      alias sebi_randomizer_map_update update
+      def update
+        # Load has assigned Scene_Map before its sprites exist. The first normal
+        # update follows createSpritesets/transition and precedes intro events.
+        SebiRandomizer.new_game_setup if @spritesets && !@spritesets.empty?
+        return sebi_randomizer_map_update
+      end
     end
   end
 end

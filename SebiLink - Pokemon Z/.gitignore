@@ -15,9 +15,14 @@
 *.sav
 *.lnk
 *.log
+*.jsonl
+*.sebilog
+*.sebikey
 *.pid
 *.ini
 *.key
+*.audit
+**/history-pending/
 *.pem
 *.pfx
 .env*

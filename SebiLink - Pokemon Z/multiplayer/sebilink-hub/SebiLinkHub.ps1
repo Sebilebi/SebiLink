@@ -248,6 +248,7 @@ $script:Actions = @(
   New-HubAction "Sistema" "Gestor de partidas" "F8" "open_quick_saves" "Abre la ventana de partidas en la pestana Cargar partida."
   New-HubAction "Sistema" "Controles extra" "SebiLink > Controles" "open_extra_controls" "Cambia las teclas de PokemonDB, debilidades e igualar niveles."
   New-HubAction "Sistema" "Buscar actualizaciones" "SebiLink" "check_sebilink_updates" "Busca una nueva version de Pokemon Z en GitHub; pregunta antes de guardar, actualizar y reiniciar."
+  New-HubAction "Sistema" "Ver registros" "SebiLink" "open_activity_log" "Selecciona un historial de cualquier jugador y abre su contenido con la clave privada y contrasena del administrador."
 )
 
 if ($SelfTest) {

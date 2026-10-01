@@ -7,7 +7,7 @@ Modificaciones por juego. Cada carpeta contiene solo su complemento, sin el jueg
 <!-- SEBILINK_VERSIONS_BEGIN -->
 | Juego | Version SebiLink | Carpeta |
 | --- | --- | --- |
-| Pokemon Z V2.18 | 1.1.1 | SebiLink - Pokemon Z |
+| Pokemon Z V2.18 | 1.7.2 | SebiLink - Pokemon Z |
 <!-- SEBILINK_VERSIONS_END -->
 
 La version corresponde al complemento SebiLink, independientemente de la version
