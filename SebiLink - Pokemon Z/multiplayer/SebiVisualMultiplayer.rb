@@ -3827,9 +3827,41 @@ module SebiCheats
   end
 
   def self.default_story_level_cap(const_name)
-    base = original_level_cap(const_name).to_i - LEVEL_CAP_VANILLA_EXTRA
+    stage = LEVEL_CAP_CONSTANTS.index(const_name.to_s)
+    return max_level if stage && stage >= 11
+    leaders = stage == 10 ? [11, 12] : (stage ? [stage + 1] : [])
+    levels = story_gym_levels
+    # Vanilla caps include differing margins; use the actual next leader's ace.
+    if leaders.length > 0 && leaders.all? { |leader| levels.has_key?(leader) }
+      base = leaders.map { |leader| levels[leader] }.max
+    else
+      base = original_level_cap(const_name).to_i - LEVEL_CAP_VANILLA_EXTRA
+    end
     base = 1 if base < 1
     return clamp(base + level_cap_default_extra, 1, max_level)
+  end
+
+  def self.story_gym_levels
+    return @story_gym_levels if @story_gym_levels
+    return {} if !defined?(PBTrainers)
+    trainer_ids = {}
+    for leader in 1..12
+      key = const_key("LIDER" + leader.to_s)
+      trainer_ids[PBTrainers.const_get(key)] = leader if PBTrainers.const_defined?(key)
+    end
+    levels = {}
+    for trainer in load_data("Data/trainers.dat")
+      leader = trainer_ids[trainer[0]]
+      next if !leader
+      for pokemon in trainer[3]
+        level = pokemon[1].to_i
+        levels[leader] = level if level > 0 && (!levels.has_key?(leader) || level > levels[leader])
+      end
+    end
+    @story_gym_levels = levels
+    return levels
+  rescue Exception
+    return {}
   end
 
   def self.natural_level_cap
@@ -4047,7 +4079,7 @@ module SebiCheats
     params.setRange(LEVEL_CAP_DEFAULT_EXTRA_MIN, LEVEL_CAP_DEFAULT_EXTRA_MAX)
     params.setDefaultValue(level_cap_default_extra)
     params.setCancelValue(-1)
-    value = Kernel.pbMessageChooseNumber(_INTL("Niveles extra sobre el proximo gimnasio. 0 = mismo nivel; 2 = default original."), params).to_i
+    value = Kernel.pbMessageChooseNumber(_INTL("Niveles extra sobre el proximo gimnasio. 0 = mismo nivel; 2 = lider +2."), params).to_i
     return if value < 0
     self.level_cap_default_extra = value
     self.level_cap_override = nil
@@ -5421,6 +5453,8 @@ module SebiLevelReview
             current_index = 0
             current_scroll = 0
             chosen_learned_index = nil
+          else
+            focus = 1
           end
         elsif focus == 1
           count = ((results[selected] || {})["learnedMoves"] || []).length

@@ -1,7 +1,7 @@
 {
     "package":  "SebiLink - Pokemon Z",
     "game":  "Pokemon Z V2.18 Windows MKXP",
-    "version":  "1.7.2",
+    "version":  "1.7.4",
     "files":  [
                   {
                       "path":  ".gitignore",
@@ -115,8 +115,8 @@
                   },
                   {
                       "path":  "multiplayer/SebiVisualMultiplayer.rb",
-                      "bytes":  821877,
-                      "sha256":  "5c5d17d92bc2509be431c597efca80c17da4c698d17d582711fa338b1394c676"
+                      "bytes":  823038,
+                      "sha256":  "9110ce5d61c400676ea1d85dd13bd6e64c17a00886b359c41dae186d876073f8"
                   },
                   {
                       "path":  "multiplayer/server.js",
@@ -156,12 +156,12 @@
                   {
                       "path":  "multiplayer/updates/update-source.json",
                       "bytes":  176,
-                      "sha256":  "6c5dfa9a83b995c4465e40d9abe09118dd93348dbc73fa62e62d6bba7165d03d"
+                      "sha256":  "0f30713d52c66cfa408715d748a1320ccb669b4b32a3d114d164faf8e7d86243"
                   },
                   {
                       "path":  "README.md",
-                      "bytes":  16808,
-                      "sha256":  "79c53f04c3354632721ceeb481a394f20031f580bbfdb6355362e6ad795d8a15"
+                      "bytes":  17443,
+                      "sha256":  "aa3bd69063041f218396384cd5ee68868b45ab62ec868027dc2b70019738d020"
                   },
                   {
                       "path":  "tools/randomizer/build-catalog.rb",

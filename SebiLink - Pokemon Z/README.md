@@ -1,6 +1,6 @@
 # SebiLink - Pokemon Z
 
-**Version SebiLink: 1.7.2.**
+**Version SebiLink: 1.7.4.**
 
 Complemento para **Pokemon Z V2.18 de ericlostie, Windows/MKXP**.
 Esta carpeta contiene el codigo de SebiLink y su configuracion de arranque.
@@ -36,6 +36,16 @@ Si ya has personalizado scripts/menu con otros mods, la compatibilidad no esta g
 | Multijugador | Salas, jugadores en mapa, seguidores/seguimiento, marcadores, intercambios, PvP y espectador integrado |
 | IA opcional | Chat, consejo de combate, analisis de equipo/postcombate y preparacion PvP mediante un puente CodeXRay propio |
 | Randomizador | Salvajes por encuentro, entrenadores/regentes, iniciales, fosiles, NPC/regalos, habilidades, ataques/MT/tutores, objetos/precios y filtros |
+
+En la revision `Rapidin`, arriba desde la primera fila de Pokemon y abajo desde
+la segunda fila abren `Movimientos nuevos` del Pokemon seleccionado. Arriba desde
+el primer movimiento vuelve al mismo Pokemon. Izquierda/derecha cambia de panel;
+C/Enter elige el movimiento nuevo y despues el movimiento actual que reemplazar.
+
+En `Level cap > Default historia`, +0 iguala el nivel del Pokemon mas alto del
+proximo regente; +1 o +2 suman exactamente ese extra. Se leen los equipos del
+juego instalado y el avance de la historia. Tras completar los regentes se
+libera el nivel maximo del juego. El limite fijo sigue disponible.
 
 En `SebiLink > Randomizador`, seleccionar una opcion ON/OFF cambia su estado
 inmediatamente. Los numeros abren un selector. `Region` permite activar/desactivar
